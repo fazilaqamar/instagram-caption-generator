@@ -17,6 +17,9 @@ st.set_page_config(
     layout="wide"
 )
 
+# ============================================
+# COMPLETE DARK THEME - WITH POPOVER FIX!
+# ============================================
 st.markdown("""
 <style>
     /* Dark background */
@@ -35,7 +38,7 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* ========== SELECTBOX ========== */
+    /* ========== SELECTBOX FIX ========== */
     .stSelectbox > div > div {
         background-color: #1a1a2e !important;
         border: 1px solid #444444 !important;
@@ -47,7 +50,7 @@ st.markdown("""
         background-color: #1a1a2e !important;
     }
     
-    /* ========== DROPDOWN POPOVER FIX ========== */
+    /* Dropdown popover fix */
     [data-baseweb="popover"],
     [data-baseweb="popover"] > div,
     [data-baseweb="popover"] ul,
@@ -56,49 +59,43 @@ st.markdown("""
     [data-baseweb="menu"] ul,
     ul[role="listbox"],
     div[role="listbox"] {
-        background-color: #ffffff !important;
-        border: 1px solid #dddddd !important;
+        background-color: #1a1a2e !important;
+        border: 1px solid #444444 !important;
         border-radius: 10px !important;
     }
     
-    /* Force ALL text in popover to BLACK on WHITE */
     [data-baseweb="popover"] *,
     [data-baseweb="menu"] *,
     ul[role="listbox"] * {
-        background-color: #ffffff !important;
-        color: #000000 !important;
+        background-color: #1a1a2e !important;
+        color: #ffffff !important;
     }
     
-    /* Each option */
     ul[role="listbox"] li,
     [data-baseweb="popover"] ul li,
     [data-baseweb="menu"] ul li,
     div[role="listbox"] li {
-        background-color: #ffffff !important;
-        color: #000000 !important;
+        background-color: #1a1a2e !important;
+        color: #ffffff !important;
         padding: 8px 12px !important;
     }
     
-    /* Hover effect */
     ul[role="listbox"] li:hover,
     [data-baseweb="popover"] ul li:hover {
-        background-color: #f0f0f0 !important;
-        color: #000000 !important;
+        background-color: #2a2a4e !important;
+        color: #ffffff !important;
     }
     
-    /* Selected option */
     ul[role="listbox"] li[aria-selected="true"],
     [data-baseweb="popover"] ul li[aria-selected="true"] {
         background-color: #4facfe !important;
         color: #ffffff !important;
     }
     
-    /* Dropdown arrow */
     .stSelectbox svg {
         fill: #ffffff !important;
     }
     
-    /* Selectbox label */
     .stSelectbox label {
         color: rgba(255,255,255,0.8) !important;
         font-weight: 500 !important;
@@ -106,9 +103,7 @@ st.markdown("""
         text-transform: uppercase !important;
     }
     
-    /* ========== OTHER STYLES ========== */
-    
-    /* Buttons */
+    /* ========== BUTTONS ========== */
     .stButton > button {
         background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe) !important;
         color: #ffffff !important;
@@ -124,12 +119,12 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
     }
     
-    /* Slider */
+    /* ========== SLIDER ========== */
     .stSlider [data-baseweb="slider"] > div > div {
         background: linear-gradient(90deg, #f093fb, #4facfe) !important;
     }
     
-    /* Text Area */
+    /* ========== TEXT AREA ========== */
     .stTextArea > div > div > textarea {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -137,7 +132,7 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* Caption Cards */
+    /* ========== CAPTION CARDS ========== */
     .caption-card {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -145,12 +140,34 @@ st.markdown("""
         padding: 1rem 1.2rem;
         margin-bottom: 0.8rem;
         border-left: 4px solid #4facfe;
+        transition: all 0.3s ease;
     }
     .caption-card:hover {
         background-color: #2a2a4e !important;
+        transform: translateX(4px);
     }
     
-    /* Hashtag Box */
+    .caption-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .caption-actions button {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 8px !important;
+        padding: 4px 12px !important;
+        font-size: 0.75rem !important;
+        color: rgba(255,255,255,0.6) !important;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .caption-actions button:hover {
+        background: rgba(255,255,255,0.1) !important;
+        color: #ffffff !important;
+    }
+    
+    /* ========== HASHTAG BOX ========== */
     .hashtag-box {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -164,7 +181,7 @@ st.markdown("""
         margin-right: 4px;
     }
     
-    /* Favorite Box */
+    /* ========== FAVORITE BOX ========== */
     .favorite-box {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -174,7 +191,7 @@ st.markdown("""
         border-left: 4px solid #ff9800;
     }
     
-    /* Download Buttons */
+    /* ========== DOWNLOAD BUTTONS ========== */
     .stDownloadButton > button {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -188,13 +205,43 @@ st.markdown("""
         border-color: #4facfe !important;
     }
     
-    /* Messages */
+    /* ========== MESSAGES ========== */
     .stAlert, .stSuccess, .stError, .stInfo {
         background-color: #1a1a2e !important;
         border-color: #333333 !important;
     }
     .stAlert p, .stSuccess p, .stError p, .stInfo p {
         color: #ffffff !important;
+    }
+    
+    /* ========== EXAMPLE BOX ========== */
+    .example-box {
+        background-color: #1a1a2e !important;
+        border: 1px dashed #444444 !important;
+        border-radius: 10px;
+        padding: 0.8rem 1rem;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.5) !important;
+    }
+    .example-box span {
+        color: #4facfe !important;
+        cursor: pointer;
+    }
+    .example-box span:hover {
+        color: #f093fb !important;
+    }
+    
+    /* ========== BADGE ========== */
+    .badge {
+        display: inline-block;
+        background: rgba(79, 172, 254, 0.15) !important;
+        border: 1px solid rgba(79, 172, 254, 0.2) !important;
+        color: #4facfe !important;
+        padding: 0.1rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        margin-left: 0.5rem;
     }
     
     /* Hide branding */
@@ -247,10 +294,24 @@ with col2:
 num_captions = st.slider("📝 Number of Captions", 3, 8, 5)
 
 # ============================================
+# EXAMPLE PROMPTS
+# ============================================
+with st.expander("💡 Need inspiration? Try these examples!"):
+    st.markdown("""
+    <div class="example-box">
+        <span>📸 Summer road trip vibes</span> · 
+        <span>✨ Luxury lifestyle captions</span> · 
+        <span>💪 Funny gym captions</span> · 
+        <span>🍕 Foodie puns</span> · 
+        <span>🌅 Sunset aesthetic</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ============================================
 # GENERATE
 # ============================================
 if st.button("✨ Generate Captions", type="primary", use_container_width=True):
-    with st.spinner("🎨 Crafting your captions..."):
+    with st.spinner("🎨 Crafting viral captions..."):
         try:
             client = get_client()
             captions, elapsed = generate_captions(
@@ -277,9 +338,19 @@ if st.session_state.get("captions"):
     hashtags = st.session_state["hashtags"]
     elapsed = st.session_state["elapsed"]
     
+    # Show generation time
     st.markdown(f"""
     <div style="display: inline-block; background: rgba(79, 172, 254, 0.1); border: 1px solid rgba(79, 172, 254, 0.15); color: rgba(255,255,255,0.5); padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.7rem; margin-bottom: 1rem;">
         ⏱ Generated in {elapsed}s
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Favorites count badge
+    fav_count = len(get_favorites())
+    st.markdown(f"""
+    <div style="display: inline-block; margin-left: 0.5rem;">
+        <span class="badge">⭐ {fav_count} Favorites</span>
+        <span class="badge">📜 {len(st.session_state.get('history', []))} History</span>
     </div>
     """, unsafe_allow_html=True)
     
@@ -296,6 +367,9 @@ if st.session_state.get("captions"):
                 <span style="color: rgba(255,255,255,0.3); font-size: 0.8rem; font-weight: 700; background: rgba(255,255,255,0.05); padding: 0.1rem 0.6rem; border-radius: 20px; margin-right: 0.5rem;">#{i}</span>
                 <span style="color: #ffffff; font-size: 1rem; line-height: 1.6;">{cap}</span>
                 <span style="font-size: 0.7rem; margin-left: 0.5rem; color: {'#4caf50' if char_count <= 150 else '#ff9800' if char_count <= 200 else '#f44336'} !important;">· {char_count}/150</span>
+                <div class="caption-actions">
+                    <button onclick="navigator.clipboard.writeText('{cap}')">📋 Copy</button>
+                </div>
             </div>
             """, unsafe_allow_html=True)
         with col2:
@@ -304,6 +378,7 @@ if st.session_state.get("captions"):
                     st.success("✅ Saved!")
                     st.rerun()
     
+    # Copy and Download
     all_text = "\n".join(f"{i}. {c}" for i, c in enumerate(captions, 1))
     
     st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">📋 Copy & Download</h3>', unsafe_allow_html=True)
@@ -329,17 +404,21 @@ if st.session_state.get("captions"):
             use_container_width=True
         )
     
+    # Hashtags - Fixed duplicate issue!
+    unique_hashtags = list(dict.fromkeys(hashtags.split()))
+    hashtags_fixed = " ".join(unique_hashtags)
+    
     st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">#️⃣ Hashtags</h3>', unsafe_allow_html=True)
-    hashtag_html = " ".join(f'<span>{tag}</span>' for tag in hashtags.split())
+    hashtag_html = " ".join(f'<span>{tag}</span>' for tag in unique_hashtags)
     st.markdown(f'<div class="hashtag-box">{hashtag_html}</div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([3, 1])
     with col1:
-        st.text_area("Copy hashtags", value=hashtags, height=60, label_visibility="collapsed")
+        st.text_area("Copy hashtags", value=hashtags_fixed, height=60, label_visibility="collapsed")
     with col2:
         st.download_button(
             label="📥 Download Hashtags",
-            data=hashtags,
+            data=hashtags_fixed,
             file_name=f"hashtags_{topic}_{style}.txt",
             mime="text/plain",
             use_container_width=True
@@ -349,7 +428,7 @@ if st.session_state.get("captions"):
 # FAVORITES
 # ============================================
 st.markdown("---")
-st.markdown('<h3 style="color: #ffffff;">⭐ Your Favorites</h3>', unsafe_allow_html=True)
+st.markdown(f'<h3 style="color: #ffffff;">⭐ Your Favorites ({len(get_favorites())})</h3>', unsafe_allow_html=True)
 
 favorites = get_favorites()
 
