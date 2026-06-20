@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 # ============================================
-# DARK THEME - WITH DROPDOWN TEXT FIX
+# COMPLETE DARK THEME - WITH POPOVER FIX!
 # ============================================
 st.markdown("""
 <style>
@@ -38,7 +38,7 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* ========== SELECTBOX FIX - THE KEY PART! ========== */
+    /* ========== SELECTBOX - THE FIX ========== */
     /* The select box itself */
     .stSelectbox > div > div {
         background-color: #1a1a2e !important;
@@ -46,49 +46,65 @@ st.markdown("""
         border-radius: 10px !important;
     }
     
-    /* The selected text - THIS IS WHAT YOU SEE! */
+    /* The selected text */
     .stSelectbox > div > div > div {
         color: #ffffff !important;
         background-color: #1a1a2e !important;
     }
     
-    /* The dropdown menu */
-    div[data-baseweb="select"] > div {
-        background-color: #1a1a2e !important;
-    }
-    
-    /* Dropdown list */
-    ul[role="listbox"] {
+    /* ========== DROPDOWN POPOVER - THE REAL FIX! ========== */
+    /* This targets the portal/popover where dropdown renders */
+    [data-baseweb="popover"],
+    [data-baseweb="popover"] > div,
+    [data-baseweb="popover"] ul,
+    [data-baseweb="menu"],
+    [data-baseweb="menu"] > div,
+    [data-baseweb="menu"] ul,
+    ul[role="listbox"],
+    div[role="listbox"] {
         background-color: #1a1a2e !important;
         border: 1px solid #444444 !important;
         border-radius: 10px !important;
     }
     
-    /* Each option text - WHITE! */
-    ul[role="listbox"] li {
+    /* Force ALL text in popover to white */
+    [data-baseweb="popover"] *,
+    [data-baseweb="menu"] *,
+    ul[role="listbox"] * {
+        background-color: #1a1a2e !important;
+        color: #ffffff !important;
+    }
+    
+    /* Each option */
+    ul[role="listbox"] li,
+    [data-baseweb="popover"] ul li,
+    [data-baseweb="menu"] ul li,
+    div[role="listbox"] li {
         background-color: #1a1a2e !important;
         color: #ffffff !important;
         padding: 8px 12px !important;
     }
     
-    /* Hover */
-    ul[role="listbox"] li:hover {
+    /* Hover effect */
+    ul[role="listbox"] li:hover,
+    [data-baseweb="popover"] ul li:hover {
         background-color: #2a2a4e !important;
         color: #ffffff !important;
     }
     
     /* Selected option */
-    ul[role="listbox"] li[aria-selected="true"] {
+    ul[role="listbox"] li[aria-selected="true"],
+    [data-baseweb="popover"] ul li[aria-selected="true"] {
         background-color: #4facfe !important;
         color: #ffffff !important;
     }
     
-    /* Dropdown arrow - WHITE */
+    /* Dropdown arrow */
     .stSelectbox svg {
         fill: #ffffff !important;
     }
     
-    /* Label text */
+    /* Selectbox label */
     .stSelectbox label {
         color: rgba(255,255,255,0.8) !important;
         font-weight: 500 !important;
@@ -260,7 +276,7 @@ if st.button("✨ Generate Captions", type="primary", use_container_width=True):
             st.info("💡 Make sure GROQ_API_KEY is in Streamlit Secrets!")
 
 # ============================================
-# DISPLAY
+# DISPLAY RESULTS
 # ============================================
 if st.session_state.get("captions"):
     captions = st.session_state["captions"]
