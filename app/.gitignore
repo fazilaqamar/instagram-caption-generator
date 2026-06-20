@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# Environment variables - NEVER COMMIT THESE!
+.env
+.env.local
+.env.*.local
+
+# Data files
+data/*.json
+data/*.csv
+data/*.xlsx
+!data/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Streamlit
+.streamlit/
