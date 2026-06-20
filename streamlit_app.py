@@ -17,9 +17,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# ============================================
-# COMPLETE DARK THEME - WITH POPOVER FIX!
-# ============================================
 st.markdown("""
 <style>
     /* Dark background */
@@ -38,22 +35,19 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* ========== SELECTBOX - THE FIX ========== */
-    /* The select box itself */
+    /* ========== SELECTBOX ========== */
     .stSelectbox > div > div {
         background-color: #1a1a2e !important;
         border: 1px solid #444444 !important;
         border-radius: 10px !important;
     }
     
-    /* The selected text */
     .stSelectbox > div > div > div {
         color: #ffffff !important;
         background-color: #1a1a2e !important;
     }
     
-    /* ========== DROPDOWN POPOVER - THE REAL FIX! ========== */
-    /* This targets the portal/popover where dropdown renders */
+    /* ========== DROPDOWN POPOVER FIX ========== */
     [data-baseweb="popover"],
     [data-baseweb="popover"] > div,
     [data-baseweb="popover"] ul,
@@ -62,17 +56,17 @@ st.markdown("""
     [data-baseweb="menu"] ul,
     ul[role="listbox"],
     div[role="listbox"] {
-        background-color: #1a1a2e !important;
-        border: 1px solid #444444 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #dddddd !important;
         border-radius: 10px !important;
     }
     
-    /* Force ALL text in popover to white */
+    /* Force ALL text in popover to BLACK on WHITE */
     [data-baseweb="popover"] *,
     [data-baseweb="menu"] *,
     ul[role="listbox"] * {
-        background-color: #1a1a2e !important;
-        color: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
     }
     
     /* Each option */
@@ -80,16 +74,16 @@ st.markdown("""
     [data-baseweb="popover"] ul li,
     [data-baseweb="menu"] ul li,
     div[role="listbox"] li {
-        background-color: #1a1a2e !important;
-        color: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
         padding: 8px 12px !important;
     }
     
     /* Hover effect */
     ul[role="listbox"] li:hover,
     [data-baseweb="popover"] ul li:hover {
-        background-color: #2a2a4e !important;
-        color: #ffffff !important;
+        background-color: #f0f0f0 !important;
+        color: #000000 !important;
     }
     
     /* Selected option */
