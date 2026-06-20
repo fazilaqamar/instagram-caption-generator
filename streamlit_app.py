@@ -1,284 +1,198 @@
-"""
-Caption Generator API - Backend Logic
-Uses Groq API (Llama 3.1)
-"""
-
-import os
 import streamlit as st
-import requests
-import json
-import re
-import time
-from datetime import datetime
+from caption_generator_api import (
+    get_client,
+    generate_captions,
+    make_hashtags,
+    VALID_TOPICS,
+    VALID_STYLES,
+    save_favorite_caption,
+    get_favorites,
+    delete_favorite,
+    clear_all_favorites
+)
 
-# ============================================
-# API KEY MANAGEMENT
-# ============================================
+st.set_page_config(
+    page_title="AI Caption Generator",
+    page_icon="⚡",
+    layout="centered",
+)
 
-def get_groq_api_key():
-    """Get API key from Streamlit Secrets or .env file"""
-    try:
-        # For Streamlit Cloud - reads from Secrets
-        return st.secrets.get("GROQ_API_KEY")
-    except (FileNotFoundError, AttributeError):
-        # For local development - reads from .env
-        return os.getenv("GROQ_API_KEY")
+st.markdown("""
+<style>
+.main .block-container { max-width: 720px; padding: 2rem 1.5rem 4rem; }
+.app-header { text-align: center; padding: 2.5rem 0 1.5rem; border-bottom: 1px solid #1e1e1e; margin-bottom: 2rem; }
+.app-header h1 { font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, #fff 0%, #888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+.app-header p { color: #555; font-size: 0.9rem; margin: 0; letter-spacing: 0.08em; text-transform: uppercase; }
+.settings-box { background: #111; border: 1px solid #1e1e1e; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+div.stButton > button { width: 100%; background: #f0f0f0; color: #0a0a0a; font-weight: 700; border: none; border-radius: 8px; padding: 0.75rem 1.5rem; cursor: pointer; }
+div.stButton > button:hover { background: #fff; transform: translateY(-1px); }
+.caption-card { background: #111; border: 1px solid #1e1e1e; border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.6rem; }
+.caption-text { font-size: 0.95rem; color: #e8e8e8; }
+.hashtag-box { background: #0e0e0e; border: 1px dashed #222; border-radius: 10px; padding: 1rem 1.2rem; font-size: 0.82rem; color: #555; line-height: 1.8; }
+.hashtag-box span { color: #3a7fff; margin-right: 4px; }
+textarea { background: #111 !important; border: 1px solid #222 !important; color: #888 !important; border-radius: 8px !important; font-size: 0.82rem !important; }
+div[data-baseweb="select"] > div { background: #111 !important; border: 1px solid #222 !important; border-radius: 8px !important; color: #f0f0f0 !important; }
+</style>
+""", unsafe_allow_html=True)
 
-# Get API key from Secrets - NO HARDCODED KEY!
-GROQ_API_KEY = get_groq_api_key()
+st.markdown("""
+<div class="app-header">
+    <h1>⚡ Caption Generator</h1>
+    <p>Groq AI — Instagram Captions</p>
+</div>
+""", unsafe_allow_html=True)
 
-# If no API key found, use fallback (only for testing)
-if not GROQ_API_KEY:
-    GROQ_API_KEY = ""
+# =========================
+# SETTINGS - Language & Creativity
+# =========================
+st.markdown('<div class="settings-box">', unsafe_allow_html=True)
 
-GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+col1, col2 = st.columns(2)
 
-# ============================================
-# CONSTANTS
-# ============================================
+with col1:
+    language = st.selectbox(
+        "🌐 Language",
+        options=["English", "Spanish", "French", "German", "Hindi", "Urdu", "Arabic"],
+        index=0
+    )
 
-VALID_TOPICS = [
-    "cars", "travel", "fashion", "fitness",
-    "food", "nature", "tech", "beauty",
-    "pets", "music", "art", "photography",
-    "business", "entrepreneur", "lifestyle", "wellness"
-]
+with col2:
+    creativity = st.slider(
+        "🎨 Creativity",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.9,
+        step=0.1,
+        help="Higher = more creative"
+    )
 
-VALID_STYLES = [
-    "funny", "luxury", "motivational",
-    "aesthetic", "bold", "emotional",
-    "savage", "relatable", "poetic",
-    "witty", "inspirational", "vibes"
-]
+st.markdown('</div>', unsafe_allow_html=True)
 
-# ============================================
-# API FUNCTIONS
-# ============================================
+# =========================
+# TOPIC & STYLE
+# =========================
+col1, col2 = st.columns(2)
 
-def get_client(api_key=None):
-    """Initialize Groq client"""
-    if api_key:
-        return {"api_key": api_key}
-    
-    # Get from Secrets
-    key = get_groq_api_key()
-    if not key:
-        raise ValueError("GROQ_API_KEY not found! Add it to Streamlit Secrets.")
-    
-    return {"api_key": key}
+with col1:
+    topic = st.selectbox("📚 Topic", VALID_TOPICS)
 
-def generate_captions(topic, style, client, language="English", num_captions=5, creativity=0.9):
-    """Generate captions using Groq API"""
-    
-    lang_instruction = f"Write in {language}." if language != "English" else ""
-    
-    prompt = f"""You are a professional social media copywriter.
+with col2:
+    style = st.selectbox("🎨 Style", VALID_STYLES)
 
-Generate exactly {num_captions} Instagram captions about {topic} in {style} style. {lang_instruction}
+# =========================
+# NUMBER OF CAPTIONS
+# =========================
+num_captions = st.slider(
+    "📝 Number of Captions",
+    min_value=3,
+    max_value=8,
+    value=5,
+    step=1
+)
 
-CRITICAL RULES:
-- NO INTRODUCTORY LINES (no "Here are...", "Check out...")
-- START DIRECTLY with caption 1
-- Each caption: 10-25 words
-- Use 1-3 emojis naturally
-- Make them unique and engaging
-- NO repetitive phrases
-- NO hashtags in captions
-
-Format EXACTLY like this:
-1. [Your first caption]
-2. [Your second caption]
-3. [Your third caption]
-4. [Your fourth caption]
-5. [Your fifth caption]
-
-Now generate {num_captions} {style} captions about {topic}:
-"""
-
-    headers = {
-        "Authorization": f"Bearer {client['api_key']}",
-        "Content-Type": "application/json"
-    }
-    
-    data = {
-        "model": "llama-3.1-8b-instant",
-        "messages": [
-            {"role": "system", "content": "You are a professional Instagram copywriter. Generate ONLY captions, no introductions. Start directly with number 1."},
-            {"role": "user", "content": prompt}
-        ],
-        "temperature": creativity,
-        "max_tokens": 400
-    }
-    
-    start_time = time.time()
-    
-    try:
-        response = requests.post(GROQ_URL, headers=headers, json=data)
-        elapsed = round(time.time() - start_time, 2)
-        
-        if response.status_code == 200:
-            result = response.json()
-            content = result['choices'][0]['message']['content']
-            
-            # Extract captions
-            captions = []
-            lines = content.split('\n')
-            
-            for line in lines:
-                line = line.strip()
-                if not line:
-                    continue
-                    
-                match = re.match(r'^\s*(\d+)[.)]\s*(.+)', line)
-                if match:
-                    caption = match.group(2).strip()
-                    if not any([
-                        caption.lower().startswith('here are'),
-                        caption.lower().startswith('check out'),
-                        caption.lower().startswith('some'),
-                        'caption' in caption.lower()[:30],
-                        ':' in caption and len(caption) < 40
-                    ]):
-                        captions.append(caption)
-                elif line and len(captions) < num_captions:
-                    if not any([
-                        line.lower().startswith('here are'),
-                        line.lower().startswith('check out'),
-                        len(line) < 10
-                    ]):
-                        captions.append(line)
-            
-            # Filter out any remaining introductions
-            filtered_captions = []
-            for cap in captions:
-                if not any([
-                    cap.lower().startswith('here are'),
-                    cap.lower().startswith('check out'),
-                    'caption' in cap.lower()[:30] and len(cap) < 50,
-                    len(cap) < 10
-                ]):
-                    filtered_captions.append(cap)
-            
-            captions = filtered_captions[:num_captions]
-            
-            # Ensure we have exactly num_captions
-            while len(captions) < num_captions:
-                captions.append(f"✨ {style} {topic} caption {len(captions)+1}")
-            
-            return captions, elapsed
-        else:
-            print(f"API Error: {response.status_code}")
-            print(response.text)
-            return [], 0
-            
-    except Exception as e:
-        print(f"Error: {e}")
-        return [], 0
-
-def make_hashtags(topic, style):
-    """Generate hashtags for the given topic and style"""
-    
-    hashtag_map = {
-        "cars": ["#carsofinstagram", "#dreamcar", "#automotive", "#carlover"],
-        "travel": ["#travelgram", "#wanderlust", "#exploremore", "#vacationmode"],
-        "fashion": ["#fashionstyle", "#ootd", "#outfitcheck", "#styleinspo"],
-        "fitness": ["#fitcheck", "#gymrat", "#gains", "#workout"],
-        "food": ["#foodie", "#instafood", "#foodporn", "#nomnomnom"],
-        "nature": ["#earthpix", "#naturephotography", "#outdoors", "#natgeo"],
-        "tech": ["#techbro", "#gadgets", "#innovation", "#techlife"],
-        "beauty": ["#glowup", "#skincare", "#makeuptok", "#beautytips"],
-        "pets": ["#petlover", "#dogsofinstagram", "#catsofinstagram", "#furryfriends"],
-        "music": ["#musiclover", "#songwriter", "#musician", "#livemusic"],
-        "art": ["#artwork", "#artist", "#creative", "#artgram"],
-        "photography": ["#photographer", "#photooftheday", "#capturethemoment", "#lens"],
-        "business": ["#entrepreneur", "#businessowner", "#success", "#startup"],
-        "entrepreneur": ["#entrepreneurlife", "#hustle", "#successmindset", "#businessgrowth"],
-        "lifestyle": ["#lifestyle", "#lifestyleblogger", "#dailyvibes", "#mindfulness"],
-        "wellness": ["#wellness", "#selfcare", "#healthyliving", "#mindfulness"]
-    }
-    
-    style_tags = {
-        "funny": "#lol",
-        "luxury": "#luxury",
-        "motivational": "#mindset",
-        "aesthetic": "#aesthetic",
-        "bold": "#bold",
-        "emotional": "#feelings",
-        "savage": "#savage",
-        "relatable": "#relatable",
-        "poetic": "#poetry",
-        "witty": "#witty",
-        "inspirational": "#inspire",
-        "vibes": "#vibes"
-    }
-    
-    default = ["#viral", "#instagram", "#trending", "#contentcreator", "#fyp"]
-    
-    topic_tags = hashtag_map.get(topic, ["#instagram", "#viral"])
-    style_tag = style_tags.get(style, "#content")
-    
-    all_tags = topic_tags + [style_tag] + default
-    return " ".join(list(dict.fromkeys(all_tags))[:15])
-
-# ============================================
-# FAVORITES FUNCTIONS
-# ============================================
-
-def save_favorite_caption(caption, topic, style):
-    """Save a favorite caption to favorites.json"""
-    try:
-        favorites_file = "data/favorites.json"
-        os.makedirs("data", exist_ok=True)
-        
+# =========================
+# GENERATE BUTTON
+# =========================
+if st.button("✨ Generate Captions", type="primary"):
+    with st.spinner("🎨 Cooking up some fire captions..."):
         try:
-            with open(favorites_file, 'r') as f:
-                favorites = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            favorites = []
-        
-        favorite = {
-            "timestamp": datetime.now().isoformat(),
-            "topic": topic,
-            "style": style,
-            "caption": caption
-        }
-        favorites.append(favorite)
-        
-        with open(favorites_file, 'w') as f:
-            json.dump(favorites, f, indent=2)
-        return True
-        
-    except Exception as e:
-        print(f"Error saving favorite: {e}")
-        return False
+            client = get_client()
+            captions, elapsed = generate_captions(
+                topic, 
+                style, 
+                client,
+                language=language,
+                num_captions=num_captions,
+                creativity=creativity
+            )
+            hashtags = make_hashtags(topic, style)
 
-def get_favorites():
-    """Get all favorite captions"""
-    try:
-        with open("data/favorites.json", 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+            st.session_state["captions"] = captions
+            st.session_state["hashtags"] = hashtags
+            st.session_state["elapsed"] = elapsed
 
-def delete_favorite(index):
-    """Delete a favorite by index"""
-    try:
-        favorites = get_favorites()
-        if 0 <= index < len(favorites):
-            del favorites[index]
-            with open("data/favorites.json", 'w') as f:
-                json.dump(favorites, f, indent=2)
-            return True
-    except Exception as e:
-        print(f"Error deleting favorite: {e}")
-    return False
+        except Exception as e:
+            st.error(f"❌ Error: {e}")
+            st.info("💡 Make sure GROQ_API_KEY is in Streamlit Secrets!")
 
-def clear_all_favorites():
-    """Clear all favorites"""
-    try:
-        with open("data/favorites.json", 'w') as f:
-            json.dump([], f)
-        return True
-    except Exception as e:
-        print(f"Error clearing favorites: {e}")
-        return False
+# =========================
+# DISPLAY RESULTS
+# =========================
+if st.session_state.get("captions"):
+    captions = st.session_state["captions"]
+    hashtags = st.session_state["hashtags"]
+    elapsed = st.session_state["elapsed"]
+
+    st.markdown("---")
+    st.markdown("### 📝 Captions")
+
+    for i, cap in enumerate(captions, 1):
+        char_count = len(cap)
+        color = "green" if char_count <= 150 else "orange" if char_count <= 200 else "red"
+        
+        col1, col2 = st.columns([10, 1])
+        with col1:
+            st.markdown(f"""
+            <div class="caption-card">
+                <span class="caption-text"><strong>{i}.</strong> {cap}</span>
+                <br>
+                <small style="color: {color};">📝 {char_count}/150 characters</small>
+            </div>
+            """, unsafe_allow_html=True)
+        with col2:
+            if st.button("⭐", key=f"fav_{i}"):
+                if save_favorite_caption(cap, topic, style):
+                    st.success("✅ Saved!")
+
+    all_text = "\n".join(f"{i}. {c}" for i, c in enumerate(captions, 1))
+    st.text_area("📋 Copy all captions", value=all_text, height=140)
+
+    st.markdown("### #️⃣ Hashtags")
+    hashtag_html = " ".join(f'<span>{tag}</span>' for tag in hashtags.split())
+    st.markdown(f'<div class="hashtag-box">{hashtag_html}</div>', unsafe_allow_html=True)
+    st.text_area("📋 Copy hashtags", value=hashtags, height=68)
+
+    # Download options
+    col1, col2 = st.columns(2)
+    with col1:
+        st.download_button(
+            label="📥 Download TXT",
+            data=all_text,
+            file_name=f"captions_{topic}_{style}.txt",
+            mime="text/plain"
+        )
+    with col2:
+        csv_data = "Caption,Character Count\n" + "\n".join(f"{c},{len(c)}" for c in captions)
+        st.download_button(
+            label="📥 Download CSV",
+            data=csv_data,
+            file_name=f"captions_{topic}_{style}.csv",
+            mime="text/csv"
+        )
+
+    st.markdown(f"⏱ Generated in {elapsed}s")
+
+# =========================
+# FAVORITES
+# =========================
+st.markdown("---")
+st.markdown("### ⭐ Your Favorites")
+
+favorites = get_favorites()
+
+if favorites:
+    for idx, fav in enumerate(reversed(favorites)):
+        with st.container():
+            st.markdown(f"""
+            <div style="background: #111; border: 1px solid #1e1e1e; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem; border-left: 3px solid #ff9800;">
+                <small style="color: #666;">📌 {fav['topic'].upper()} - {fav['style'].upper()} | 📅 {fav['timestamp'][:16]}</small>
+                <br>
+                <span style="color: #e8e8e8;">{fav['caption']}</span>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button(f"🗑️ Delete", key=f"del_{idx}"):
+                if delete_favorite(len(favorites) - 1 - idx):
+                    st.success("Deleted!")
+                    st.rerun()
+else:
+    st.info("💡 No favorites yet. Click ⭐ on any caption to save it!")
