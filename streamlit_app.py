@@ -7,7 +7,7 @@
 # Place this file in same folder as caption_generator_api.py
 
 import streamlit as st
-import pyperclip
+
 from caption_generator_api import (
     get_client, generate_captions, make_hashtags,
     VALID_TOPICS, VALID_STYLES,
