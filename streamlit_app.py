@@ -22,26 +22,31 @@ st.set_page_config(
 )
 
 # ============================================
-# CUSTOM CSS - FIXED DARK THEME
+# CUSTOM CSS - DARK THEME (FIXED)
 # ============================================
 st.markdown("""
 <style>
-    /* Global Styles - Dark Background */
+    /* Force dark background */
     .stApp {
-        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%) !important;
+        background: #0a0a0f !important;
     }
     
-    /* ALL TEXT - WHITE */
     .main .block-container {
         max-width: 900px;
         padding: 2rem 2rem 4rem;
+        background: transparent !important;
+    }
+    
+    /* All text white */
+    * {
+        color: #ffffff !important;
     }
     
     /* Glassmorphism Card */
     .glass-card {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 20px;
         padding: 1.5rem 2rem;
         margin-bottom: 1.5rem;
@@ -81,7 +86,7 @@ st.markdown("""
         margin-top: 0.5rem;
     }
     
-    /* Labels - WHITE */
+    /* Labels */
     .stSelectbox label, .stSlider label {
         color: rgba(255,255,255,0.8) !important;
         font-weight: 500 !important;
@@ -94,25 +99,35 @@ st.markdown("""
         background: rgba(255,255,255,0.06) !important;
         border: 1px solid rgba(255,255,255,0.1) !important;
         border-radius: 12px !important;
-        color: #f0f0f0 !important;
+        color: #ffffff !important;
     }
     div[data-baseweb="select"] > div:hover {
         border-color: rgba(79, 172, 254, 0.4) !important;
     }
     div[data-baseweb="select"] > div > div {
-        color: #f0f0f0 !important;
+        color: #ffffff !important;
+    }
+    ul[role="listbox"] li {
+        background: #1a1a2e !important;
+        color: #ffffff !important;
+    }
+    ul[role="listbox"] li:hover {
+        background: rgba(79, 172, 254, 0.2) !important;
     }
     
-    /* Slider Value - WHITE */
+    /* Slider */
     .stSlider > div > div > div > div {
-        color: #f0f0f0 !important;
+        color: #ffffff !important;
+    }
+    .stSlider [data-baseweb="slider"] > div > div {
+        background: linear-gradient(90deg, #f093fb, #4facfe) !important;
     }
     
     /* Generate Button */
     div.stButton > button {
         width: 100%;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
-        color: white !important;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%) !important;
+        color: #ffffff !important;
         font-weight: 600;
         font-size: 1rem;
         border: none;
@@ -125,12 +140,13 @@ st.markdown("""
     div.stButton > button:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 30px rgba(245, 87, 108, 0.5);
+        color: #ffffff !important;
     }
     
-    /* Caption Cards - Dark */
+    /* Caption Cards */
     .caption-card {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.04) !important;
+        border: 1px solid rgba(255,255,255,0.06) !important;
         border-radius: 14px;
         padding: 1.2rem 1.5rem;
         margin-bottom: 0.8rem;
@@ -148,8 +164,8 @@ st.markdown("""
         border-radius: 4px 0 0 4px;
     }
     .caption-card:hover {
-        background: rgba(255,255,255,0.08);
-        border-color: rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.08) !important;
+        border-color: rgba(255,255,255,0.15) !important;
         transform: translateX(4px);
     }
     .caption-number {
@@ -164,7 +180,7 @@ st.markdown("""
     }
     .caption-text {
         font-size: 1rem;
-        color: #e8e8e8 !important;
+        color: #ffffff !important;
         line-height: 1.6;
     }
     .caption-char {
@@ -175,10 +191,10 @@ st.markdown("""
     .caption-char.ok { color: #ff9800 !important; }
     .caption-char.long { color: #f44336 !important; }
     
-    /* Hashtag Box - Dark */
+    /* Hashtag Box */
     .hashtag-box {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.04) !important;
+        border: 1px solid rgba(255,255,255,0.06) !important;
         border-radius: 14px;
         padding: 1rem 1.5rem;
         font-size: 0.85rem;
@@ -197,15 +213,15 @@ st.markdown("""
     
     /* Favorite Box */
     .favorite-box {
-        background: rgba(255, 152, 0, 0.08);
-        border: 1px solid rgba(255, 152, 0, 0.15);
+        background: rgba(255, 152, 0, 0.08) !important;
+        border: 1px solid rgba(255, 152, 0, 0.15) !important;
         border-radius: 12px;
         padding: 0.8rem 1.2rem;
         margin-bottom: 0.6rem;
         border-left: 3px solid #ff9800;
     }
     .favorite-box:hover {
-        background: rgba(255, 152, 0, 0.12);
+        background: rgba(255, 152, 0, 0.12) !important;
     }
     .favorite-topic {
         color: rgba(255,255,255,0.5) !important;
@@ -214,16 +230,16 @@ st.markdown("""
         letter-spacing: 0.1em;
     }
     .favorite-caption {
-        color: #e8e8e8 !important;
+        color: #ffffff !important;
         font-size: 0.9rem;
         margin-top: 0.2rem;
     }
     
-    /* Text Area - Dark */
+    /* Text Area */
     textarea {
         background: rgba(255,255,255,0.04) !important;
         border: 1px solid rgba(255,255,255,0.08) !important;
-        color: #e8e8e8 !important;
+        color: #ffffff !important;
         border-radius: 12px !important;
         font-size: 0.85rem !important;
     }
@@ -271,9 +287,6 @@ st.markdown("""
         transform: scale(1.2) !important;
     }
     
-    /* Hide Streamlit branding */
-    #MainMenu, footer, header { visibility: hidden; }
-    
     /* Download Buttons */
     .stDownloadButton > button {
         background: rgba(255,255,255,0.06) !important;
@@ -287,22 +300,33 @@ st.markdown("""
     .stDownloadButton > button:hover {
         background: rgba(255,255,255,0.1) !important;
         border-color: rgba(255,255,255,0.2) !important;
+        color: #ffffff !important;
     }
     
     /* Info message */
     .stAlert {
         background: rgba(255,255,255,0.05) !important;
         border-color: rgba(255,255,255,0.1) !important;
-        color: #e8e8e8 !important;
+        color: #ffffff !important;
+    }
+    .stAlert p {
+        color: #ffffff !important;
     }
     
-    /* Selectbox options */
-    ul[role="listbox"] li {
-        background: #1a1a2e !important;
-        color: #f0f0f0 !important;
+    /* Hide Streamlit branding */
+    #MainMenu, footer, header { visibility: hidden; }
+    
+    /* Number input */
+    input[type="number"] {
+        background: rgba(255,255,255,0.06) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        color: #ffffff !important;
+        border-radius: 8px !important;
     }
-    ul[role="listbox"] li:hover {
-        background: rgba(79, 172, 254, 0.2) !important;
+    
+    /* Divider */
+    hr {
+        border-color: rgba(255,255,255,0.05) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -434,7 +458,6 @@ if st.session_state.get("captions"):
             use_container_width=True
         )
     with col3:
-        # CSV Download - FIXED!
         csv_data = "Caption,Character Count\n" + "\n".join(f'"{c}",{len(c)}' for c in captions)
         st.download_button(
             label="📊 CSV",
