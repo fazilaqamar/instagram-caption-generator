@@ -281,4 +281,8 @@ def clear_all_favorites():
         return True
     except Exception as e:
         print(f"Error clearing favorites: {e}")
+<<<<<<< HEAD
         return False
+=======
+        return False
+>>>>>>> 8666f69107c19efea1475b1cb4755211502a3614
