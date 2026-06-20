@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # ============================================
-# CUSTOM CSS - DARK THEME
+# CUSTOM CSS - FIXED DARK THEME
 # ============================================
 st.markdown("""
 <style>
@@ -31,6 +31,7 @@ st.markdown("""
         background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%) !important;
     }
     
+    /* ALL TEXT - WHITE */
     .main .block-container {
         max-width: 900px;
         padding: 2rem 2rem 4rem;
@@ -61,7 +62,7 @@ st.markdown("""
         margin: 0;
     }
     .app-header .subtitle {
-        color: rgba(255,255,255,0.5);
+        color: rgba(255,255,255,0.6) !important;
         font-size: 1rem;
         letter-spacing: 0.3em;
         text-transform: uppercase;
@@ -71,7 +72,7 @@ st.markdown("""
         display: inline-block;
         background: rgba(79, 172, 254, 0.2);
         border: 1px solid rgba(79, 172, 254, 0.3);
-        color: #4facfe;
+        color: #4facfe !important;
         padding: 0.2rem 1rem;
         border-radius: 20px;
         font-size: 0.7rem;
@@ -80,9 +81,9 @@ st.markdown("""
         margin-top: 0.5rem;
     }
     
-    /* Labels */
+    /* Labels - WHITE */
     .stSelectbox label, .stSlider label {
-        color: rgba(255,255,255,0.7) !important;
+        color: rgba(255,255,255,0.8) !important;
         font-weight: 500 !important;
         font-size: 0.8rem !important;
         text-transform: uppercase !important;
@@ -98,17 +99,20 @@ st.markdown("""
     div[data-baseweb="select"] > div:hover {
         border-color: rgba(79, 172, 254, 0.4) !important;
     }
+    div[data-baseweb="select"] > div > div {
+        color: #f0f0f0 !important;
+    }
     
-    /* Slider */
-    .stSlider [data-baseweb="slider"] > div > div {
-        background: linear-gradient(90deg, #f093fb, #4facfe) !important;
+    /* Slider Value - WHITE */
+    .stSlider > div > div > div > div {
+        color: #f0f0f0 !important;
     }
     
     /* Generate Button */
     div.stButton > button {
         width: 100%;
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
-        color: white;
+        color: white !important;
         font-weight: 600;
         font-size: 1rem;
         border: none;
@@ -152,7 +156,7 @@ st.markdown("""
         display: inline-block;
         font-size: 0.7rem;
         font-weight: 700;
-        color: rgba(255,255,255,0.3);
+        color: rgba(255,255,255,0.4) !important;
         background: rgba(255,255,255,0.06);
         padding: 0.1rem 0.6rem;
         border-radius: 20px;
@@ -160,16 +164,16 @@ st.markdown("""
     }
     .caption-text {
         font-size: 1rem;
-        color: #e8e8e8;
+        color: #e8e8e8 !important;
         line-height: 1.6;
     }
     .caption-char {
         font-size: 0.7rem;
         margin-left: 0.5rem;
     }
-    .caption-char.good { color: #4caf50; }
-    .caption-char.ok { color: #ff9800; }
-    .caption-char.long { color: #f44336; }
+    .caption-char.good { color: #4caf50 !important; }
+    .caption-char.ok { color: #ff9800 !important; }
+    .caption-char.long { color: #f44336 !important; }
     
     /* Hashtag Box - Dark */
     .hashtag-box {
@@ -178,16 +182,16 @@ st.markdown("""
         border-radius: 14px;
         padding: 1rem 1.5rem;
         font-size: 0.85rem;
-        color: rgba(255,255,255,0.6);
+        color: rgba(255,255,255,0.6) !important;
         line-height: 2;
         word-break: break-all;
     }
     .hashtag-box span {
-        color: #4facfe;
+        color: #4facfe !important;
         margin-right: 6px;
     }
     .hashtag-box span:hover {
-        color: #f093fb;
+        color: #f093fb !important;
         cursor: pointer;
     }
     
@@ -204,13 +208,13 @@ st.markdown("""
         background: rgba(255, 152, 0, 0.12);
     }
     .favorite-topic {
-        color: rgba(255,255,255,0.4);
+        color: rgba(255,255,255,0.5) !important;
         font-size: 0.65rem;
         text-transform: uppercase;
         letter-spacing: 0.1em;
     }
     .favorite-caption {
-        color: #e8e8e8;
+        color: #e8e8e8 !important;
         font-size: 0.9rem;
         margin-top: 0.2rem;
     }
@@ -219,19 +223,22 @@ st.markdown("""
     textarea {
         background: rgba(255,255,255,0.04) !important;
         border: 1px solid rgba(255,255,255,0.08) !important;
-        color: rgba(255,255,255,0.7) !important;
+        color: #e8e8e8 !important;
         border-radius: 12px !important;
         font-size: 0.85rem !important;
     }
     textarea:focus {
         border-color: rgba(79, 172, 254, 0.4) !important;
     }
+    textarea::placeholder {
+        color: rgba(255,255,255,0.3) !important;
+    }
     
     /* Section Headers */
     .section-title {
         font-size: 1.1rem;
         font-weight: 600;
-        color: rgba(255,255,255,0.8);
+        color: rgba(255,255,255,0.8) !important;
         margin: 1.5rem 0 1rem;
     }
     .section-title .emoji {
@@ -243,7 +250,7 @@ st.markdown("""
         display: inline-block;
         background: rgba(79, 172, 254, 0.1);
         border: 1px solid rgba(79, 172, 254, 0.15);
-        color: rgba(255,255,255,0.5);
+        color: rgba(255,255,255,0.5) !important;
         padding: 0.2rem 1rem;
         border-radius: 20px;
         font-size: 0.7rem;
@@ -268,17 +275,34 @@ st.markdown("""
     #MainMenu, footer, header { visibility: hidden; }
     
     /* Download Buttons */
-    .download-btn {
+    .stDownloadButton > button {
         background: rgba(255,255,255,0.06) !important;
         border: 1px solid rgba(255,255,255,0.08) !important;
         color: rgba(255,255,255,0.7) !important;
         border-radius: 10px !important;
         padding: 0.5rem 1rem !important;
         font-size: 0.8rem !important;
+        width: 100% !important;
     }
-    .download-btn:hover {
+    .stDownloadButton > button:hover {
         background: rgba(255,255,255,0.1) !important;
         border-color: rgba(255,255,255,0.2) !important;
+    }
+    
+    /* Info message */
+    .stAlert {
+        background: rgba(255,255,255,0.05) !important;
+        border-color: rgba(255,255,255,0.1) !important;
+        color: #e8e8e8 !important;
+    }
+    
+    /* Selectbox options */
+    ul[role="listbox"] li {
+        background: #1a1a2e !important;
+        color: #f0f0f0 !important;
+    }
+    ul[role="listbox"] li:hover {
+        background: rgba(79, 172, 254, 0.2) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -396,22 +420,24 @@ if st.session_state.get("captions"):
     # Copy and Download
     all_text = "\n".join(f"{i}. {c}" for i, c in enumerate(captions, 1))
     
+    st.markdown('<div class="section-title"><span class="emoji">📋</span> Copy & Download</div>', unsafe_allow_html=True)
+    
     col1, col2, col3 = st.columns([2, 1, 1])
     with col1:
-        st.text_area("📋 Copy all captions", value=all_text, height=100, label_visibility="collapsed")
+        st.text_area("Copy all captions", value=all_text, height=100, label_visibility="collapsed")
     with col2:
         st.download_button(
-            label="📥 Download TXT",
+            label="📥 TXT",
             data=all_text,
             file_name=f"captions_{topic}_{style}.txt",
             mime="text/plain",
             use_container_width=True
         )
     with col3:
-        # CSV Download
-        csv_data = "Caption,Character Count\n" + "\n".join(f"{c},{len(c)}" for c in captions)
+        # CSV Download - FIXED!
+        csv_data = "Caption,Character Count\n" + "\n".join(f'"{c}",{len(c)}' for c in captions)
         st.download_button(
-            label="📊 Download CSV",
+            label="📊 CSV",
             data=csv_data,
             file_name=f"captions_{topic}_{style}.csv",
             mime="text/csv",
@@ -422,7 +448,18 @@ if st.session_state.get("captions"):
     st.markdown('<div class="section-title"><span class="emoji">#️⃣</span> Hashtags</div>', unsafe_allow_html=True)
     hashtag_html = " ".join(f'<span>{tag}</span>' for tag in hashtags.split())
     st.markdown(f'<div class="hashtag-box">{hashtag_html}</div>', unsafe_allow_html=True)
-    st.text_area("📋 Copy hashtags", value=hashtags, height=60, label_visibility="collapsed")
+    
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.text_area("Copy hashtags", value=hashtags, height=60, label_visibility="collapsed")
+    with col2:
+        st.download_button(
+            label="📥 Hashtags",
+            data=hashtags,
+            file_name=f"hashtags_{topic}_{style}.txt",
+            mime="text/plain",
+            use_container_width=True
+        )
 
 # ============================================
 # FAVORITES
