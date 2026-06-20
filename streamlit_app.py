@@ -86,12 +86,6 @@ textarea {
     border-radius: 8px !important;
     font-size: 0.82rem !important;
 }
-input[type="password"] {
-    background: #111 !important;
-    border: 1px solid #222 !important;
-    color: #f0f0f0 !important;
-    border-radius: 8px !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -102,18 +96,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-with st.expander("🔑 API Key Setup", expanded=True):
-    api_key_input = st.text_input(
-        "Groq API Key",
-        type="password",
-        placeholder="gsk_...",
-    )
-    if api_key_input:
-        st.session_state["api_key"] = api_key_input
-        st.session_state["api_key_saved"] = True
-        st.success("✅ Key saved")
-
-api_key = st.session_state.get("api_key", "")
+# =========================
+# NO API KEY INPUT NEEDED!
+# It's loaded from Secrets automatically
+# =========================
 
 col1, col2 = st.columns(2)
 
@@ -124,13 +110,10 @@ with col2:
     style = st.selectbox("Style", VALID_STYLES)
 
 if st.button("Generate Captions"):
-    if not api_key:
-        st.error("❌ Enter your API key above")
-        st.stop()
-
     with st.spinner("Generating..."):
         try:
-            client = get_client(api_key)
+            # Get client with API key from Secrets
+            client = get_client()
             captions, elapsed = generate_captions(topic, style, client)
             hashtags = make_hashtags(topic, style)
 
@@ -140,7 +123,7 @@ if st.button("Generate Captions"):
 
         except Exception as e:
             st.error(f"❌ Error: {e}")
-            st.stop()
+            st.info("💡 Make sure you've added GROQ_API_KEY to Secrets in Streamlit Cloud settings!")
 
 if st.session_state.get("captions"):
     captions = st.session_state["captions"]
