@@ -18,10 +18,11 @@ st.set_page_config(
 )
 
 # ============================================
-# DARK THEME - NO DROPDOWN ISSUE!
+# DARK THEME - WITH DROPDOWN TEXT FIX
 # ============================================
 st.markdown("""
 <style>
+    /* Dark background */
     .stApp {
         background: #0a0a0f !important;
     }
@@ -37,7 +38,67 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* BUTTONS */
+    /* ========== SELECTBOX FIX - THE KEY PART! ========== */
+    /* The select box itself */
+    .stSelectbox > div > div {
+        background-color: #1a1a2e !important;
+        border: 1px solid #444444 !important;
+        border-radius: 10px !important;
+    }
+    
+    /* The selected text - THIS IS WHAT YOU SEE! */
+    .stSelectbox > div > div > div {
+        color: #ffffff !important;
+        background-color: #1a1a2e !important;
+    }
+    
+    /* The dropdown menu */
+    div[data-baseweb="select"] > div {
+        background-color: #1a1a2e !important;
+    }
+    
+    /* Dropdown list */
+    ul[role="listbox"] {
+        background-color: #1a1a2e !important;
+        border: 1px solid #444444 !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Each option text - WHITE! */
+    ul[role="listbox"] li {
+        background-color: #1a1a2e !important;
+        color: #ffffff !important;
+        padding: 8px 12px !important;
+    }
+    
+    /* Hover */
+    ul[role="listbox"] li:hover {
+        background-color: #2a2a4e !important;
+        color: #ffffff !important;
+    }
+    
+    /* Selected option */
+    ul[role="listbox"] li[aria-selected="true"] {
+        background-color: #4facfe !important;
+        color: #ffffff !important;
+    }
+    
+    /* Dropdown arrow - WHITE */
+    .stSelectbox svg {
+        fill: #ffffff !important;
+    }
+    
+    /* Label text */
+    .stSelectbox label {
+        color: rgba(255,255,255,0.8) !important;
+        font-weight: 500 !important;
+        font-size: 0.8rem !important;
+        text-transform: uppercase !important;
+    }
+    
+    /* ========== OTHER STYLES ========== */
+    
+    /* Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe) !important;
         color: #ffffff !important;
@@ -53,12 +114,12 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
     }
     
-    /* SLIDER */
+    /* Slider */
     .stSlider [data-baseweb="slider"] > div > div {
         background: linear-gradient(90deg, #f093fb, #4facfe) !important;
     }
     
-    /* TEXT AREA */
+    /* Text Area */
     .stTextArea > div > div > textarea {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -66,7 +127,7 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* CAPTION CARDS */
+    /* Caption Cards */
     .caption-card {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -79,7 +140,7 @@ st.markdown("""
         background-color: #2a2a4e !important;
     }
     
-    /* HASHTAG BOX */
+    /* Hashtag Box */
     .hashtag-box {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -93,7 +154,7 @@ st.markdown("""
         margin-right: 4px;
     }
     
-    /* FAVORITE BOX */
+    /* Favorite Box */
     .favorite-box {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -103,7 +164,7 @@ st.markdown("""
         border-left: 4px solid #ff9800;
     }
     
-    /* DOWNLOAD BUTTONS */
+    /* Download Buttons */
     .stDownloadButton > button {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -117,6 +178,15 @@ st.markdown("""
         border-color: #4facfe !important;
     }
     
+    /* Messages */
+    .stAlert, .stSuccess, .stError, .stInfo {
+        background-color: #1a1a2e !important;
+        border-color: #333333 !important;
+    }
+    .stAlert p, .stSuccess p, .stError p, .stInfo p {
+        color: #ffffff !important;
+    }
+    
     /* Hide branding */
     #MainMenu, footer, header {
         display: none !important;
@@ -124,24 +194,6 @@ st.markdown("""
     
     hr {
         border-color: rgba(255,255,255,0.05) !important;
-    }
-    
-    /* ========== FIX FOR SELECTBOX ========== */
-    /* This makes the select box DARK */
-    .stSelectbox > div > div {
-        background-color: #1a1a2e !important;
-        border: 1px solid #444444 !important;
-        border-radius: 10px !important;
-        color: #ffffff !important;
-    }
-    
-    .stSelectbox > div > div > div {
-        color: #ffffff !important;
-        background-color: #1a1a2e !important;
-    }
-    
-    .stSelectbox > div > div:hover {
-        border-color: #4facfe !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -158,18 +210,16 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================
-# SETTINGS - USING COLUMNS FOR BETTER LAYOUT
+# SETTINGS
 # ============================================
 st.markdown("---")
 
-# Row 1: Topic & Style
 col1, col2 = st.columns(2)
 with col1:
     topic = st.selectbox("📚 Topic", VALID_TOPICS)
 with col2:
     style = st.selectbox("🎨 Style", VALID_STYLES)
 
-# Row 2: Language & Creativity
 col1, col2 = st.columns(2)
 with col1:
     language = st.selectbox(
@@ -184,11 +234,10 @@ with col2:
         help="Higher = more creative"
     )
 
-# Row 3: Number of Captions
 num_captions = st.slider("📝 Number of Captions", 3, 8, 5)
 
 # ============================================
-# GENERATE BUTTON
+# GENERATE
 # ============================================
 if st.button("✨ Generate Captions", type="primary", use_container_width=True):
     with st.spinner("🎨 Crafting your captions..."):
@@ -211,7 +260,7 @@ if st.button("✨ Generate Captions", type="primary", use_container_width=True):
             st.info("💡 Make sure GROQ_API_KEY is in Streamlit Secrets!")
 
 # ============================================
-# DISPLAY RESULTS
+# DISPLAY
 # ============================================
 if st.session_state.get("captions"):
     captions = st.session_state["captions"]
@@ -245,7 +294,6 @@ if st.session_state.get("captions"):
                     st.success("✅ Saved!")
                     st.rerun()
     
-    # Copy and Download
     all_text = "\n".join(f"{i}. {c}" for i, c in enumerate(captions, 1))
     
     st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">📋 Copy & Download</h3>', unsafe_allow_html=True)
@@ -271,7 +319,6 @@ if st.session_state.get("captions"):
             use_container_width=True
         )
     
-    # Hashtags
     st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">#️⃣ Hashtags</h3>', unsafe_allow_html=True)
     hashtag_html = " ".join(f'<span>{tag}</span>' for tag in hashtags.split())
     st.markdown(f'<div class="hashtag-box">{hashtag_html}</div>', unsafe_allow_html=True)
