@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 # ============================================
-# COMPLETE DARK THEME - EVERYTHING FIXED
+# COMPLETE DARK THEME - LANGUAGE FIXED
 # ============================================
 st.markdown("""
 <style>
@@ -43,35 +43,54 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* Selectbox - FIXED */
+    /* ========== SELECTBOX - LANGUAGE FIX ========== */
+    /* Main selectbox container */
     .stSelectbox > div > div {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
         border-radius: 10px !important;
         color: #ffffff !important;
     }
+    
     .stSelectbox > div > div > div {
         color: #ffffff !important;
+        background-color: #1a1a2e !important;
     }
+    
     .stSelectbox > div > div:hover {
         border-color: #4facfe !important;
     }
     
-    /* Selectbox dropdown options */
+    /* Dropdown menu - THE IMPORTANT PART! */
     ul[role="listbox"] {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
+        border-radius: 10px !important;
+        padding: 4px 0 !important;
     }
+    
     ul[role="listbox"] li {
         background-color: #1a1a2e !important;
         color: #ffffff !important;
+        padding: 8px 12px !important;
+        font-size: 0.9rem !important;
     }
+    
     ul[role="listbox"] li:hover {
         background-color: #2a2a4e !important;
     }
+    
     ul[role="listbox"] li[aria-selected="true"] {
         background-color: #4facfe !important;
         color: #ffffff !important;
+    }
+    
+    /* Selectbox label */
+    .stSelectbox label {
+        color: rgba(255,255,255,0.8) !important;
+        font-weight: 500 !important;
+        font-size: 0.8rem !important;
+        text-transform: uppercase !important;
     }
     
     /* Slider */
@@ -80,6 +99,12 @@ st.markdown("""
     }
     .stSlider [data-baseweb="slider"] > div > div {
         background: linear-gradient(90deg, #f093fb, #4facfe) !important;
+    }
+    .stSlider label {
+        color: rgba(255,255,255,0.8) !important;
+        font-weight: 500 !important;
+        font-size: 0.8rem !important;
+        text-transform: uppercase !important;
     }
     
     /* Text Input */
@@ -101,15 +126,7 @@ st.markdown("""
         border-color: #4facfe !important;
     }
     
-    /* Number Input */
-    .stNumberInput > div > div > input {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        border-radius: 10px !important;
-        color: #ffffff !important;
-    }
-    
-    /* Generate Button - FIXED */
+    /* Generate Button */
     .stButton > button {
         background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe) !important;
         color: #ffffff !important;
@@ -128,7 +145,7 @@ st.markdown("""
         transform: scale(0.98);
     }
     
-    /* Download Buttons - FIXED */
+    /* Download Buttons */
     .stDownloadButton > button {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -209,6 +226,14 @@ st.markdown("""
     /* Divider */
     hr {
         border-color: rgba(255,255,255,0.05) !important;
+    }
+    
+    /* Number Input */
+    .stNumberInput > div > div > input {
+        background-color: #1a1a2e !important;
+        border: 1px solid #333333 !important;
+        border-radius: 10px !important;
+        color: #ffffff !important;
     }
 </style>
 """, unsafe_allow_html=True)
