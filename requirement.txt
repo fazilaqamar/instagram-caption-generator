@@ -1,3 +1,2 @@
-streamlit
-groq
-pyperclip
+streamlit==1.31.0
+requests==2.32.3
