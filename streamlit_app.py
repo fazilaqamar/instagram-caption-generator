@@ -18,36 +18,50 @@ st.set_page_config(
 )
 
 # ============================================
-# SIMPLE DARK THEME - WORKS 100%
+# COMPLETE DARK THEME - EVERYTHING FIXED
 # ============================================
 st.markdown("""
 <style>
-    /* Force dark background everywhere */
+    /* Force dark background on everything */
     .stApp {
-        background-color: #0a0a0f !important;
+        background: #0a0a0f !important;
     }
     
-    /* All text white */
-    body, p, div, span, label, h1, h2, h3, h4, h5, h6 {
+    .main .block-container {
+        background: transparent !important;
+        max-width: 900px;
+        padding: 2rem !important;
+    }
+    
+    /* ALL TEXT WHITE */
+    * {
         color: #ffffff !important;
     }
     
-    /* Main container */
-    .main .block-container {
-        max-width: 900px;
-        padding: 2rem 2rem 4rem;
-        background-color: transparent !important;
+    /* Headers */
+    h1, h2, h3, h4, h5, h6, p, div, span, label {
+        color: #ffffff !important;
     }
     
-    /* Cards */
+    /* Selectbox - FIXED */
     .stSelectbox > div > div {
         background-color: #1a1a2e !important;
-        color: #ffffff !important;
-        border: 1px solid #333 !important;
+        border: 1px solid #333333 !important;
         border-radius: 10px !important;
+        color: #ffffff !important;
+    }
+    .stSelectbox > div > div > div {
+        color: #ffffff !important;
+    }
+    .stSelectbox > div > div:hover {
+        border-color: #4facfe !important;
     }
     
-    /* Selectbox options */
+    /* Selectbox dropdown options */
+    ul[role="listbox"] {
+        background-color: #1a1a2e !important;
+        border: 1px solid #333333 !important;
+    }
     ul[role="listbox"] li {
         background-color: #1a1a2e !important;
         color: #ffffff !important;
@@ -55,29 +69,47 @@ st.markdown("""
     ul[role="listbox"] li:hover {
         background-color: #2a2a4e !important;
     }
-    
-    /* Text input */
-    .stTextInput > div > div > input {
-        background-color: #1a1a2e !important;
+    ul[role="listbox"] li[aria-selected="true"] {
+        background-color: #4facfe !important;
         color: #ffffff !important;
-        border: 1px solid #333 !important;
-        border-radius: 10px !important;
-    }
-    
-    /* Text area */
-    .stTextArea > div > div > textarea {
-        background-color: #1a1a2e !important;
-        color: #ffffff !important;
-        border: 1px solid #333 !important;
-        border-radius: 10px !important;
     }
     
     /* Slider */
     .stSlider > div > div > div > div {
         color: #ffffff !important;
     }
+    .stSlider [data-baseweb="slider"] > div > div {
+        background: linear-gradient(90deg, #f093fb, #4facfe) !important;
+    }
     
-    /* Generate Button */
+    /* Text Input */
+    .stTextInput > div > div > input {
+        background-color: #1a1a2e !important;
+        border: 1px solid #333333 !important;
+        border-radius: 10px !important;
+        color: #ffffff !important;
+    }
+    
+    /* Text Area */
+    .stTextArea > div > div > textarea {
+        background-color: #1a1a2e !important;
+        border: 1px solid #333333 !important;
+        border-radius: 10px !important;
+        color: #ffffff !important;
+    }
+    .stTextArea > div > div > textarea:focus {
+        border-color: #4facfe !important;
+    }
+    
+    /* Number Input */
+    .stNumberInput > div > div > input {
+        background-color: #1a1a2e !important;
+        border: 1px solid #333333 !important;
+        border-radius: 10px !important;
+        color: #ffffff !important;
+    }
+    
+    /* Generate Button - FIXED */
     .stButton > button {
         background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe) !important;
         color: #ffffff !important;
@@ -92,11 +124,28 @@ st.markdown("""
         transform: scale(1.02);
         box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
     }
+    .stButton > button:active {
+        transform: scale(0.98);
+    }
+    
+    /* Download Buttons - FIXED */
+    .stDownloadButton > button {
+        background-color: #1a1a2e !important;
+        border: 1px solid #333333 !important;
+        color: #ffffff !important;
+        border-radius: 10px !important;
+        padding: 0.5rem 1rem !important;
+        width: 100% !important;
+    }
+    .stDownloadButton > button:hover {
+        background-color: #2a2a4e !important;
+        border-color: #4facfe !important;
+    }
     
     /* Caption Cards */
     .caption-card {
         background-color: #1a1a2e !important;
-        border: 1px solid #333 !important;
+        border: 1px solid #333333 !important;
         border-radius: 12px;
         padding: 1rem 1.2rem;
         margin-bottom: 0.8rem;
@@ -105,26 +154,14 @@ st.markdown("""
     .caption-card:hover {
         background-color: #2a2a4e !important;
     }
-    .caption-text {
-        color: #ffffff !important;
-        font-size: 1rem;
-    }
-    .caption-char {
-        font-size: 0.7rem;
-        margin-left: 0.5rem;
-    }
-    .caption-char.good { color: #4caf50 !important; }
-    .caption-char.ok { color: #ff9800 !important; }
-    .caption-char.long { color: #f44336 !important; }
     
     /* Hashtag Box */
     .hashtag-box {
         background-color: #1a1a2e !important;
-        border: 1px solid #333 !important;
+        border: 1px solid #333333 !important;
         border-radius: 12px;
         padding: 1rem;
         font-size: 0.85rem;
-        color: #aaaaaa !important;
         line-height: 2;
     }
     .hashtag-box span {
@@ -135,32 +172,33 @@ st.markdown("""
     /* Favorite Box */
     .favorite-box {
         background-color: #1a1a2e !important;
-        border: 1px solid #333 !important;
+        border: 1px solid #333333 !important;
         border-radius: 10px;
         padding: 0.8rem 1rem;
         margin-bottom: 0.6rem;
         border-left: 4px solid #ff9800;
     }
-    .favorite-caption {
-        color: #ffffff !important;
-        font-size: 0.9rem;
+    
+    /* Info/Success/Error Messages */
+    .stAlert {
+        background-color: #1a1a2e !important;
+        border-color: #333333 !important;
     }
-    .favorite-topic {
-        color: #aaaaaa !important;
-        font-size: 0.7rem;
+    .stAlert p {
+        color: #ffffff !important;
+    }
+    .stSuccess {
+        background-color: #1a2e1a !important;
+        border-color: #4caf50 !important;
+    }
+    .stError {
+        background-color: #2e1a1a !important;
+        border-color: #f44336 !important;
     }
     
-    /* Download buttons */
-    .stDownloadButton > button {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333 !important;
+    /* Spinner */
+    .stSpinner > div {
         color: #ffffff !important;
-        border-radius: 10px !important;
-        padding: 0.4rem 1rem !important;
-        width: 100% !important;
-    }
-    .stDownloadButton > button:hover {
-        background-color: #2a2a4e !important;
     }
     
     /* Hide branding */
@@ -168,34 +206,9 @@ st.markdown("""
         display: none !important;
     }
     
-    /* Info text */
-    .stAlert {
-        background-color: #1a1a2e !important;
-        border-color: #333 !important;
-        color: #ffffff !important;
-    }
-    .stAlert p {
-        color: #ffffff !important;
-    }
-    
-    /* Success message */
-    .stSuccess {
-        background-color: #1a2e1a !important;
-        border-color: #4caf50 !important;
-        color: #ffffff !important;
-    }
-    .stSuccess p {
-        color: #ffffff !important;
-    }
-    
-    /* Error message */
-    .stError {
-        background-color: #2e1a1a !important;
-        border-color: #f44336 !important;
-        color: #ffffff !important;
-    }
-    .stError p {
-        color: #ffffff !important;
+    /* Divider */
+    hr {
+        border-color: rgba(255,255,255,0.05) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -214,35 +227,34 @@ st.markdown("""
 # ============================================
 # SETTINGS
 # ============================================
-with st.container():
-    st.markdown("---")
-    
-    col1, col2, col3 = st.columns([2, 2, 1])
-    
-    with col1:
-        topic = st.selectbox("📚 Topic", VALID_TOPICS)
-    
-    with col2:
-        style = st.selectbox("🎨 Style", VALID_STYLES)
-    
-    with col3:
-        num_captions = st.slider("📝 Count", 3, 8, 5)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        language = st.selectbox(
-            "🌐 Language",
-            ["English", "Spanish", "French", "German", "Hindi", "Urdu", "Arabic"],
-            index=0
-        )
-    
-    with col2:
-        creativity = st.slider(
-            "🎨 Creativity",
-            0.0, 1.0, 0.9, 0.1,
-            help="Higher = more creative"
-        )
+st.markdown("---")
+
+col1, col2, col3 = st.columns([2, 2, 1])
+
+with col1:
+    topic = st.selectbox("📚 Topic", VALID_TOPICS)
+
+with col2:
+    style = st.selectbox("🎨 Style", VALID_STYLES)
+
+with col3:
+    num_captions = st.slider("📝 Count", 3, 8, 5)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    language = st.selectbox(
+        "🌐 Language",
+        ["English", "Spanish", "French", "German", "Hindi", "Urdu", "Arabic"],
+        index=0
+    )
+
+with col2:
+    creativity = st.slider(
+        "🎨 Creativity",
+        0.0, 1.0, 0.9, 0.1,
+        help="Higher = more creative"
+    )
 
 # ============================================
 # GENERATE BUTTON
@@ -276,12 +288,12 @@ if st.session_state.get("captions"):
     elapsed = st.session_state["elapsed"]
     
     st.markdown(f"""
-    <div style="display: inline-block; background: rgba(79, 172, 254, 0.1); border: 1px solid rgba(79, 172, 254, 0.15); color: rgba(255,255,255,0.5); padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.7rem;">
+    <div style="display: inline-block; background: rgba(79, 172, 254, 0.1); border: 1px solid rgba(79, 172, 254, 0.15); color: rgba(255,255,255,0.5); padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.7rem; margin-bottom: 1rem;">
         ⏱ Generated in {elapsed}s
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">📝 Your Captions</h3>', unsafe_allow_html=True)
+    st.markdown('<h3 style="color: #ffffff; margin-top: 0.5rem;">📝 Your Captions</h3>', unsafe_allow_html=True)
     
     for i, cap in enumerate(captions, 1):
         char_count = len(cap)
@@ -292,8 +304,8 @@ if st.session_state.get("captions"):
             st.markdown(f"""
             <div class="caption-card">
                 <span style="color: rgba(255,255,255,0.3); font-size: 0.8rem; font-weight: 700; background: rgba(255,255,255,0.05); padding: 0.1rem 0.6rem; border-radius: 20px; margin-right: 0.5rem;">#{i}</span>
-                <span class="caption-text">{cap}</span>
-                <span class="caption-char {color}">· {char_count}/150</span>
+                <span style="color: #ffffff; font-size: 1rem; line-height: 1.6;">{cap}</span>
+                <span style="font-size: 0.7rem; margin-left: 0.5rem; color: {'#4caf50' if char_count <= 150 else '#ff9800' if char_count <= 200 else '#f44336'} !important;">· {char_count}/150</span>
             </div>
             """, unsafe_allow_html=True)
         with col2:
@@ -312,7 +324,7 @@ if st.session_state.get("captions"):
         st.text_area("Copy all captions", value=all_text, height=100, label_visibility="collapsed")
     with col2:
         st.download_button(
-            label="📥 TXT",
+            label="📥 Download TXT",
             data=all_text,
             file_name=f"captions_{topic}_{style}.txt",
             mime="text/plain",
@@ -321,7 +333,7 @@ if st.session_state.get("captions"):
     with col3:
         csv_data = "Caption,Character Count\n" + "\n".join(f'"{c}",{len(c)}' for c in captions)
         st.download_button(
-            label="📊 CSV",
+            label="📊 Download CSV",
             data=csv_data,
             file_name=f"captions_{topic}_{style}.csv",
             mime="text/csv",
@@ -338,7 +350,7 @@ if st.session_state.get("captions"):
         st.text_area("Copy hashtags", value=hashtags, height=60, label_visibility="collapsed")
     with col2:
         st.download_button(
-            label="📥 Hashtags",
+            label="📥 Download Hashtags",
             data=hashtags,
             file_name=f"hashtags_{topic}_{style}.txt",
             mime="text/plain",
@@ -357,8 +369,8 @@ if favorites:
     for idx, fav in enumerate(reversed(favorites)):
         st.markdown(f"""
         <div class="favorite-box">
-            <span class="favorite-topic">📌 {fav['topic'].upper()} · {fav['style'].upper()} · {fav['timestamp'][:16]}</span>
-            <div class="favorite-caption">{fav['caption']}</div>
+            <span style="color: rgba(255,255,255,0.4); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;">📌 {fav['topic'].upper()} · {fav['style'].upper()} · {fav['timestamp'][:16]}</span>
+            <div style="color: #ffffff; font-size: 0.9rem; margin-top: 0.2rem;">{fav['caption']}</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button(f"🗑️ Delete", key=f"del_{idx}"):
