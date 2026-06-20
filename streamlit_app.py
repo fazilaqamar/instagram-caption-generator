@@ -18,76 +18,82 @@ st.set_page_config(
 )
 
 # ============================================
-# COMPLETE DARK THEME - LANGUAGE 100% FIXED
+# ULTIMATE DARK THEME - FORCES EVERYTHING!
 # ============================================
 st.markdown("""
 <style>
-    /* Force dark background on everything */
-    .stApp {
+    /* Force dark background on EVERYTHING */
+    .stApp, .stApp > div, .main, .block-container, section, .st-emotion-cache-1v0mbdj, .st-emotion-cache-1r6slb0 {
         background: #0a0a0f !important;
+        background-color: #0a0a0f !important;
     }
     
     .main .block-container {
-        background: transparent !important;
         max-width: 900px;
         padding: 2rem !important;
+        background: transparent !important;
     }
     
-    /* ALL TEXT WHITE */
+    /* ALL TEXT WHITE - FORCE */
     * {
         color: #ffffff !important;
     }
     
-    /* ========== SELECTBOX - LANGUAGE 100% FIXED ========== */
-    /* The select box itself */
-    .stSelectbox > div > div {
+    /* === SELECTBOX - ULTIMATE FIX === */
+    /* The select box container */
+    .stSelectbox, .stSelectbox > div, .stSelectbox > div > div {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
         border-radius: 10px !important;
-        color: #ffffff !important;
     }
     
-    /* The selected value text */
+    /* The select box value */
     .stSelectbox > div > div > div {
+        background-color: #1a1a2e !important;
         color: #ffffff !important;
-        background-color: #1a1a2e !important;
     }
     
-    /* The dropdown menu container */
-    div[data-baseweb="select"] > div {
-        background-color: #1a1a2e !important;
-    }
-    
-    /* The dropdown list */
-    ul[role="listbox"] {
+    /* The dropdown list - THE KEY PART */
+    div[data-baseweb="select"] > div, 
+    div[data-baseweb="select"] > div > div,
+    ul[role="listbox"],
+    div[role="listbox"],
+    [role="listbox"] {
         background-color: #1a1a2e !important;
         border: 1px solid #444444 !important;
         border-radius: 10px !important;
-        padding: 4px 0 !important;
     }
     
     /* Each dropdown option */
-    ul[role="listbox"] li {
+    ul[role="listbox"] li, 
+    div[role="listbox"] li,
+    [role="listbox"] li {
         background-color: #1a1a2e !important;
         color: #ffffff !important;
         padding: 8px 12px !important;
         font-size: 0.9rem !important;
     }
     
-    /* Hover effect on options */
-    ul[role="listbox"] li:hover {
+    /* Hover effect */
+    ul[role="listbox"] li:hover, 
+    div[role="listbox"] li:hover,
+    [role="listbox"] li:hover {
         background-color: #2a2a4e !important;
+        color: #ffffff !important;
     }
     
     /* Selected option */
-    ul[role="listbox"] li[aria-selected="true"] {
+    ul[role="listbox"] li[aria-selected="true"],
+    div[role="listbox"] li[aria-selected="true"],
+    [role="listbox"] li[aria-selected="true"] {
         background-color: #4facfe !important;
         color: #ffffff !important;
     }
     
     /* The dropdown arrow */
-    .stSelectbox > div > div > div > svg {
+    .stSelectbox svg, .stSelectbox svg * {
         fill: #ffffff !important;
+        color: #ffffff !important;
     }
     
     /* Selectbox label */
@@ -98,7 +104,7 @@ st.markdown("""
         text-transform: uppercase !important;
     }
     
-    /* Slider */
+    /* === SLIDER === */
     .stSlider > div > div > div > div {
         color: #ffffff !important;
     }
@@ -107,31 +113,9 @@ st.markdown("""
     }
     .stSlider label {
         color: rgba(255,255,255,0.8) !important;
-        font-weight: 500 !important;
-        font-size: 0.8rem !important;
-        text-transform: uppercase !important;
     }
     
-    /* Text Input */
-    .stTextInput > div > div > input {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        border-radius: 10px !important;
-        color: #ffffff !important;
-    }
-    
-    /* Text Area */
-    .stTextArea > div > div > textarea {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        border-radius: 10px !important;
-        color: #ffffff !important;
-    }
-    .stTextArea > div > div > textarea:focus {
-        border-color: #4facfe !important;
-    }
-    
-    /* Generate Button */
+    /* === BUTTONS === */
     .stButton > button {
         background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe) !important;
         color: #ffffff !important;
@@ -147,7 +131,7 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
     }
     
-    /* Download Buttons */
+    /* === DOWNLOAD BUTTONS === */
     .stDownloadButton > button {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -161,7 +145,7 @@ st.markdown("""
         border-color: #4facfe !important;
     }
     
-    /* Caption Cards */
+    /* === CAPTION CARDS === */
     .caption-card {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -174,7 +158,7 @@ st.markdown("""
         background-color: #2a2a4e !important;
     }
     
-    /* Hashtag Box */
+    /* === HASHTAG BOX === */
     .hashtag-box {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -188,7 +172,7 @@ st.markdown("""
         margin-right: 4px;
     }
     
-    /* Favorite Box */
+    /* === FAVORITE BOX === */
     .favorite-box {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -198,44 +182,41 @@ st.markdown("""
         border-left: 4px solid #ff9800;
     }
     
-    /* Info/Success/Error */
-    .stAlert {
+    /* === MESSAGES === */
+    .stAlert, .stSuccess, .stError, .stInfo {
         background-color: #1a1a2e !important;
         border-color: #333333 !important;
     }
-    .stAlert p {
+    .stAlert p, .stSuccess p, .stError p, .stInfo p {
         color: #ffffff !important;
     }
-    .stSuccess {
-        background-color: #1a2e1a !important;
-        border-color: #4caf50 !important;
-    }
-    .stError {
-        background-color: #2e1a1a !important;
-        border-color: #f44336 !important;
-    }
+    .stSuccess { border-color: #4caf50 !important; }
+    .stError { border-color: #f44336 !important; }
     
-    /* Spinner */
-    .stSpinner > div {
-        color: #ffffff !important;
-    }
-    
-    /* Hide branding */
-    #MainMenu, footer, header {
-        display: none !important;
-    }
-    
-    /* Divider */
-    hr {
-        border-color: rgba(255,255,255,0.05) !important;
-    }
-    
-    /* Number Input */
-    .stNumberInput > div > div > input {
+    /* === TEXT AREA === */
+    .stTextArea > div > div > textarea {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
         border-radius: 10px !important;
         color: #ffffff !important;
+    }
+    .stTextArea > div > div > textarea:focus {
+        border-color: #4facfe !important;
+    }
+    
+    /* === SPINNER === */
+    .stSpinner > div {
+        color: #ffffff !important;
+    }
+    
+    /* === HIDE BRANDING === */
+    #MainMenu, footer, header {
+        display: none !important;
+    }
+    
+    /* === DIVIDER === */
+    hr {
+        border-color: rgba(255,255,255,0.05) !important;
     }
 </style>
 """, unsafe_allow_html=True)
