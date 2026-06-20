@@ -18,16 +18,18 @@ from datetime import datetime
 def get_groq_api_key():
     """Get API key from Streamlit Secrets or .env file"""
     try:
+        # For Streamlit Cloud - reads from Secrets
         return st.secrets.get("GROQ_API_KEY")
     except (FileNotFoundError, AttributeError):
+        # For local development - reads from .env
         return os.getenv("GROQ_API_KEY")
 
-# Get API key - NO HARDCODED KEY!
+# Get API key from Secrets - NO HARDCODED KEY!
 GROQ_API_KEY = get_groq_api_key()
 
-# If no API key found, show error
+# If no API key found, use fallback (only for testing)
 if not GROQ_API_KEY:
-    raise ValueError("GROQ_API_KEY not found! Add it to Streamlit Secrets or .env file")
+    GROQ_API_KEY = ""
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -57,7 +59,13 @@ def get_client(api_key=None):
     """Initialize Groq client"""
     if api_key:
         return {"api_key": api_key}
-    return {"api_key": GROQ_API_KEY}
+    
+    # Get from Secrets
+    key = get_groq_api_key()
+    if not key:
+        raise ValueError("GROQ_API_KEY not found! Add it to Streamlit Secrets.")
+    
+    return {"api_key": key}
 
 def generate_captions(topic, style, client, language="English", num_captions=5, creativity=0.9):
     """Generate captions using Groq API"""
