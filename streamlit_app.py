@@ -152,20 +152,6 @@ st.markdown("""
         gap: 10px;
         margin-top: 8px;
     }
-    .caption-actions button {
-        background: rgba(255,255,255,0.05) !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
-        border-radius: 8px !important;
-        padding: 4px 12px !important;
-        font-size: 0.75rem !important;
-        color: rgba(255,255,255,0.6) !important;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .caption-actions button:hover {
-        background: rgba(255,255,255,0.1) !important;
-        color: #ffffff !important;
-    }
     
     /* ========== HASHTAG BOX ========== */
     .hashtag-box {
@@ -367,9 +353,6 @@ if st.session_state.get("captions"):
                 <span style="color: rgba(255,255,255,0.3); font-size: 0.8rem; font-weight: 700; background: rgba(255,255,255,0.05); padding: 0.1rem 0.6rem; border-radius: 20px; margin-right: 0.5rem;">#{i}</span>
                 <span style="color: #ffffff; font-size: 1rem; line-height: 1.6;">{cap}</span>
                 <span style="font-size: 0.7rem; margin-left: 0.5rem; color: {'#4caf50' if char_count <= 150 else '#ff9800' if char_count <= 200 else '#f44336'} !important;">· {char_count}/150</span>
-                <div class="caption-actions">
-                    <button onclick="navigator.clipboard.writeText('{cap}')">📋 Copy</button>
-                </div>
             </div>
             """, unsafe_allow_html=True)
         with col2:
@@ -404,25 +387,13 @@ if st.session_state.get("captions"):
             use_container_width=True
         )
     
-    # Hashtags - Fixed duplicate issue!
+    # Hashtags - ONE TIME ONLY!
     unique_hashtags = list(dict.fromkeys(hashtags.split()))
     hashtags_fixed = " ".join(unique_hashtags)
     
     st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">#️⃣ Hashtags</h3>', unsafe_allow_html=True)
     hashtag_html = " ".join(f'<span>{tag}</span>' for tag in unique_hashtags)
     st.markdown(f'<div class="hashtag-box">{hashtag_html}</div>', unsafe_allow_html=True)
-    
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        st.text_area("Copy hashtags", value=hashtags_fixed, height=60, label_visibility="collapsed")
-    with col2:
-        st.download_button(
-            label="📥 Download Hashtags",
-            data=hashtags_fixed,
-            file_name=f"hashtags_{topic}_{style}.txt",
-            mime="text/plain",
-            use_container_width=True
-        )
 
 # ============================================
 # FAVORITES
