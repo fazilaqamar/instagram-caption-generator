@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 # ============================================
-# COMPLETE DARK THEME - LANGUAGE FIXED
+# COMPLETE DARK THEME - LANGUAGE 100% FIXED
 # ============================================
 st.markdown("""
 <style>
@@ -38,13 +38,8 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* Headers */
-    h1, h2, h3, h4, h5, h6, p, div, span, label {
-        color: #ffffff !important;
-    }
-    
-    /* ========== SELECTBOX - LANGUAGE FIX ========== */
-    /* Main selectbox container */
+    /* ========== SELECTBOX - LANGUAGE 100% FIXED ========== */
+    /* The select box itself */
     .stSelectbox > div > div {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -52,23 +47,26 @@ st.markdown("""
         color: #ffffff !important;
     }
     
+    /* The selected value text */
     .stSelectbox > div > div > div {
         color: #ffffff !important;
         background-color: #1a1a2e !important;
     }
     
-    .stSelectbox > div > div:hover {
-        border-color: #4facfe !important;
+    /* The dropdown menu container */
+    div[data-baseweb="select"] > div {
+        background-color: #1a1a2e !important;
     }
     
-    /* Dropdown menu - THE IMPORTANT PART! */
+    /* The dropdown list */
     ul[role="listbox"] {
         background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
+        border: 1px solid #444444 !important;
         border-radius: 10px !important;
         padding: 4px 0 !important;
     }
     
+    /* Each dropdown option */
     ul[role="listbox"] li {
         background-color: #1a1a2e !important;
         color: #ffffff !important;
@@ -76,13 +74,20 @@ st.markdown("""
         font-size: 0.9rem !important;
     }
     
+    /* Hover effect on options */
     ul[role="listbox"] li:hover {
         background-color: #2a2a4e !important;
     }
     
+    /* Selected option */
     ul[role="listbox"] li[aria-selected="true"] {
         background-color: #4facfe !important;
         color: #ffffff !important;
+    }
+    
+    /* The dropdown arrow */
+    .stSelectbox > div > div > div > svg {
+        fill: #ffffff !important;
     }
     
     /* Selectbox label */
@@ -141,9 +146,6 @@ st.markdown("""
         transform: scale(1.02);
         box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
     }
-    .stButton > button:active {
-        transform: scale(0.98);
-    }
     
     /* Download Buttons */
     .stDownloadButton > button {
@@ -196,7 +198,7 @@ st.markdown("""
         border-left: 4px solid #ff9800;
     }
     
-    /* Info/Success/Error Messages */
+    /* Info/Success/Error */
     .stAlert {
         background-color: #1a1a2e !important;
         border-color: #333333 !important;
