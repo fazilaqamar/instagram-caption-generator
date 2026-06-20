@@ -3,11 +3,7 @@
 #  Run: streamlit run streamlit_app.py
 # ============================================================
 
-# pip install streamlit anthropic
-# Place this file in same folder as caption_generator_api.py
-
 import streamlit as st
-
 from caption_generator_api import (
     get_client, generate_captions, make_hashtags,
     VALID_TOPICS, VALID_STYLES,
@@ -35,13 +31,11 @@ html, body, [class*="css"] {
     color: #f0f0f0;
 }
 
-/* Main container */
 .main .block-container {
     max-width: 720px;
     padding: 2rem 1.5rem 4rem;
 }
 
-/* Header */
 .app-header {
     text-align: center;
     padding: 2.5rem 0 1.5rem;
@@ -66,7 +60,6 @@ html, body, [class*="css"] {
     text-transform: uppercase;
 }
 
-/* Selectbox label */
 label {
     font-family: 'Syne', sans-serif !important;
     font-size: 0.75rem !important;
@@ -76,7 +69,6 @@ label {
     color: #666 !important;
 }
 
-/* Selectbox */
 div[data-baseweb="select"] > div {
     background: #111 !important;
     border: 1px solid #222 !important;
@@ -88,7 +80,6 @@ div[data-baseweb="select"] > div:hover {
     border-color: #444 !important;
 }
 
-/* Generate button */
 div.stButton > button {
     width: 100%;
     background: #f0f0f0;
@@ -111,7 +102,6 @@ div.stButton > button:hover {
     box-shadow: 0 8px 24px rgba(255,255,255,0.08);
 }
 
-/* Caption card */
 .caption-card {
     background: #111;
     border: 1px solid #1e1e1e;
@@ -141,7 +131,6 @@ div.stButton > button:hover {
     line-height: 1.4;
 }
 
-/* Hashtag box */
 .hashtag-box {
     background: #0e0e0e;
     border: 1px dashed #222;
@@ -158,7 +147,6 @@ div.stButton > button:hover {
     margin-right: 4px;
 }
 
-/* Section label */
 .section-label {
     font-family: 'Syne', sans-serif;
     font-size: 0.7rem;
@@ -169,7 +157,6 @@ div.stButton > button:hover {
     margin: 1.5rem 0 0.6rem;
 }
 
-/* Speed badge */
 .speed-badge {
     display: inline-block;
     background: #111;
@@ -181,7 +168,6 @@ div.stButton > button:hover {
     margin-top: 1rem;
 }
 
-/* Text area for copy */
 textarea {
     background: #111 !important;
     border: 1px solid #222 !important;
@@ -190,7 +176,6 @@ textarea {
     font-size: 0.82rem !important;
 }
 
-/* API key input */
 input[type="password"], input[type="text"] {
     background: #111 !important;
     border: 1px solid #222 !important;
@@ -199,13 +184,11 @@ input[type="password"], input[type="text"] {
     font-family: 'DM Sans', sans-serif !important;
 }
 
-/* Divider */
 hr {
     border-color: #1a1a1a !important;
     margin: 1.5rem 0 !important;
 }
 
-/* Hide streamlit branding */
 #MainMenu, footer, header { visibility: hidden; }
 </style>
 """, unsafe_allow_html=True)
@@ -217,7 +200,7 @@ hr {
 st.markdown("""
 <div class="app-header">
     <h1>⚡ Caption Generator</h1>
-    <p>Claude AI — GenZ Instagram Captions</p>
+    <p>Groq AI — Instagram Captions</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -227,10 +210,10 @@ st.markdown("""
 # =========================
 with st.expander("🔑 API Key Setup", expanded=not st.session_state.get("api_key_saved")):
     api_key_input = st.text_input(
-        "Anthropic API Key",
+        "Groq API Key",
         type="password",
-        placeholder="sk-ant-api03-...",
-        help="Get your key at https://console.anthropic.com",
+        placeholder="gsk_...",
+        help="Get your key at https://console.groq.com",
     )
     if api_key_input:
         st.session_state["api_key"] = api_key_input
@@ -267,19 +250,18 @@ generate_btn = st.button("Generate Captions →")
 # =========================
 if generate_btn:
     if not api_key:
-        st.error("❌ API key daalo pehle — upar wale section mein")
+        st.error("❌ API key required — enter it above")
         st.stop()
 
     with st.spinner("Generating..."):
         try:
-            client           = get_client(api_key)
+            client = get_client(api_key)
             captions, elapsed = generate_captions(topic, style, client)
-            hashtags          = make_hashtags(topic, style)
+            hashtags = make_hashtags(topic, style)
 
-            # save to session
             st.session_state["captions"] = captions
             st.session_state["hashtags"] = hashtags
-            st.session_state["elapsed"]  = elapsed
+            st.session_state["elapsed"] = elapsed
 
         except Exception as e:
             st.error(f"❌ Error: {e}")
@@ -293,7 +275,7 @@ if st.session_state.get("captions"):
 
     captions = st.session_state["captions"]
     hashtags = st.session_state["hashtags"]
-    elapsed  = st.session_state["elapsed"]
+    elapsed = st.session_state["elapsed"]
 
     st.markdown('<div class="section-label">📝 Captions</div>', unsafe_allow_html=True)
 
@@ -305,7 +287,6 @@ if st.session_state.get("captions"):
         </div>
         """, unsafe_allow_html=True)
 
-    # copy all captions
     all_captions_text = "\n".join(f"{i}. {c}" for i, c in enumerate(captions, 1))
     st.text_area(
         "Copy all captions",
@@ -316,7 +297,6 @@ if st.session_state.get("captions"):
 
     st.markdown('<div class="section-label">#️⃣ Hashtags</div>', unsafe_allow_html=True)
 
-    # render hashtags as colored spans
     hashtag_html = " ".join(
         f'<span>{tag}</span>' for tag in hashtags.split()
     )
@@ -333,6 +313,6 @@ if st.session_state.get("captions"):
 
     st.markdown("---")
     st.markdown(
-        '<p style="text-align:center;color:#2a2a2a;font-size:0.75rem;">Built with Claude API · Anthropic</p>',
+        '<p style="text-align:center;color:#2a2a2a;font-size:0.75rem;">Built with Groq AI · Llama 3.1</p>',
         unsafe_allow_html=True,
     )
