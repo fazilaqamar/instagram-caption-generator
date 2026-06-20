@@ -11,177 +11,103 @@ from caption_generator_api import (
     clear_all_favorites
 )
 
-# ============================================
-# PAGE CONFIG
-# ============================================
 st.set_page_config(
     page_title="⚡ AI Caption Generator",
     page_icon="✨",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
 # ============================================
-# CUSTOM CSS - DARK THEME (FIXED)
+# SIMPLE DARK THEME - WORKS 100%
 # ============================================
 st.markdown("""
 <style>
-    /* Force dark background */
+    /* Force dark background everywhere */
     .stApp {
-        background: #0a0a0f !important;
-    }
-    
-    .main .block-container {
-        max-width: 900px;
-        padding: 2rem 2rem 4rem;
-        background: transparent !important;
+        background-color: #0a0a0f !important;
     }
     
     /* All text white */
-    * {
+    body, p, div, span, label, h1, h2, h3, h4, h5, h6 {
         color: #ffffff !important;
     }
     
-    /* Glassmorphism Card */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.05) !important;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 20px;
-        padding: 1.5rem 2rem;
-        margin-bottom: 1.5rem;
+    /* Main container */
+    .main .block-container {
+        max-width: 900px;
+        padding: 2rem 2rem 4rem;
+        background-color: transparent !important;
     }
     
-    /* Header */
-    .app-header {
-        text-align: center;
-        padding: 2.5rem 0 1.5rem;
-        margin-bottom: 2rem;
-    }
-    .app-header h1 {
-        font-size: 3.2rem;
-        font-weight: 700;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin: 0;
-    }
-    .app-header .subtitle {
-        color: rgba(255,255,255,0.6) !important;
-        font-size: 1rem;
-        letter-spacing: 0.3em;
-        text-transform: uppercase;
-        margin-top: 0.5rem;
-    }
-    .app-header .badge {
-        display: inline-block;
-        background: rgba(79, 172, 254, 0.2);
-        border: 1px solid rgba(79, 172, 254, 0.3);
-        color: #4facfe !important;
-        padding: 0.2rem 1rem;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        margin-top: 0.5rem;
-    }
-    
-    /* Labels */
-    .stSelectbox label, .stSlider label {
-        color: rgba(255,255,255,0.8) !important;
-        font-weight: 500 !important;
-        font-size: 0.8rem !important;
-        text-transform: uppercase !important;
-    }
-    
-    /* Selectbox */
-    div[data-baseweb="select"] > div {
-        background: rgba(255,255,255,0.06) !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
-        border-radius: 12px !important;
+    /* Cards */
+    .stSelectbox > div > div {
+        background-color: #1a1a2e !important;
         color: #ffffff !important;
+        border: 1px solid #333 !important;
+        border-radius: 10px !important;
     }
-    div[data-baseweb="select"] > div:hover {
-        border-color: rgba(79, 172, 254, 0.4) !important;
-    }
-    div[data-baseweb="select"] > div > div {
-        color: #ffffff !important;
-    }
+    
+    /* Selectbox options */
     ul[role="listbox"] li {
-        background: #1a1a2e !important;
+        background-color: #1a1a2e !important;
         color: #ffffff !important;
     }
     ul[role="listbox"] li:hover {
-        background: rgba(79, 172, 254, 0.2) !important;
+        background-color: #2a2a4e !important;
+    }
+    
+    /* Text input */
+    .stTextInput > div > div > input {
+        background-color: #1a1a2e !important;
+        color: #ffffff !important;
+        border: 1px solid #333 !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Text area */
+    .stTextArea > div > div > textarea {
+        background-color: #1a1a2e !important;
+        color: #ffffff !important;
+        border: 1px solid #333 !important;
+        border-radius: 10px !important;
     }
     
     /* Slider */
     .stSlider > div > div > div > div {
         color: #ffffff !important;
     }
-    .stSlider [data-baseweb="slider"] > div > div {
-        background: linear-gradient(90deg, #f093fb, #4facfe) !important;
-    }
     
     /* Generate Button */
-    div.stButton > button {
-        width: 100%;
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%) !important;
+    .stButton > button {
+        background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe) !important;
         color: #ffffff !important;
-        font-weight: 600;
-        font-size: 1rem;
-        border: none;
-        border-radius: 14px;
-        padding: 0.9rem 1.5rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 20px rgba(245, 87, 108, 0.3);
+        font-weight: 600 !important;
+        border: none !important;
+        border-radius: 14px !important;
+        padding: 0.9rem !important;
+        width: 100% !important;
+        font-size: 1rem !important;
     }
-    div.stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 30px rgba(245, 87, 108, 0.5);
-        color: #ffffff !important;
+    .stButton > button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
     }
     
     /* Caption Cards */
     .caption-card {
-        background: rgba(255,255,255,0.04) !important;
-        border: 1px solid rgba(255,255,255,0.06) !important;
-        border-radius: 14px;
-        padding: 1.2rem 1.5rem;
+        background-color: #1a1a2e !important;
+        border: 1px solid #333 !important;
+        border-radius: 12px;
+        padding: 1rem 1.2rem;
         margin-bottom: 0.8rem;
-        position: relative;
-        overflow: hidden;
-    }
-    .caption-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(180deg, #f093fb, #4facfe);
-        border-radius: 4px 0 0 4px;
+        border-left: 4px solid #4facfe;
     }
     .caption-card:hover {
-        background: rgba(255,255,255,0.08) !important;
-        border-color: rgba(255,255,255,0.15) !important;
-        transform: translateX(4px);
-    }
-    .caption-number {
-        display: inline-block;
-        font-size: 0.7rem;
-        font-weight: 700;
-        color: rgba(255,255,255,0.4) !important;
-        background: rgba(255,255,255,0.06);
-        padding: 0.1rem 0.6rem;
-        border-radius: 20px;
-        margin-right: 0.8rem;
+        background-color: #2a2a4e !important;
     }
     .caption-text {
-        font-size: 1rem;
         color: #ffffff !important;
-        line-height: 1.6;
+        font-size: 1rem;
     }
     .caption-char {
         font-size: 0.7rem;
@@ -193,140 +119,83 @@ st.markdown("""
     
     /* Hashtag Box */
     .hashtag-box {
-        background: rgba(255,255,255,0.04) !important;
-        border: 1px solid rgba(255,255,255,0.06) !important;
-        border-radius: 14px;
-        padding: 1rem 1.5rem;
+        background-color: #1a1a2e !important;
+        border: 1px solid #333 !important;
+        border-radius: 12px;
+        padding: 1rem;
         font-size: 0.85rem;
-        color: rgba(255,255,255,0.6) !important;
+        color: #aaaaaa !important;
         line-height: 2;
-        word-break: break-all;
     }
     .hashtag-box span {
         color: #4facfe !important;
-        margin-right: 6px;
-    }
-    .hashtag-box span:hover {
-        color: #f093fb !important;
-        cursor: pointer;
+        margin-right: 4px;
     }
     
     /* Favorite Box */
     .favorite-box {
-        background: rgba(255, 152, 0, 0.08) !important;
-        border: 1px solid rgba(255, 152, 0, 0.15) !important;
-        border-radius: 12px;
-        padding: 0.8rem 1.2rem;
+        background-color: #1a1a2e !important;
+        border: 1px solid #333 !important;
+        border-radius: 10px;
+        padding: 0.8rem 1rem;
         margin-bottom: 0.6rem;
-        border-left: 3px solid #ff9800;
-    }
-    .favorite-box:hover {
-        background: rgba(255, 152, 0, 0.12) !important;
-    }
-    .favorite-topic {
-        color: rgba(255,255,255,0.5) !important;
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
+        border-left: 4px solid #ff9800;
     }
     .favorite-caption {
         color: #ffffff !important;
         font-size: 0.9rem;
-        margin-top: 0.2rem;
     }
-    
-    /* Text Area */
-    textarea {
-        background: rgba(255,255,255,0.04) !important;
-        border: 1px solid rgba(255,255,255,0.08) !important;
-        color: #ffffff !important;
-        border-radius: 12px !important;
-        font-size: 0.85rem !important;
-    }
-    textarea:focus {
-        border-color: rgba(79, 172, 254, 0.4) !important;
-    }
-    textarea::placeholder {
-        color: rgba(255,255,255,0.3) !important;
-    }
-    
-    /* Section Headers */
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: rgba(255,255,255,0.8) !important;
-        margin: 1.5rem 0 1rem;
-    }
-    .section-title .emoji {
-        margin-right: 0.5rem;
-    }
-    
-    /* Badge */
-    .gen-badge {
-        display: inline-block;
-        background: rgba(79, 172, 254, 0.1);
-        border: 1px solid rgba(79, 172, 254, 0.15);
-        color: rgba(255,255,255,0.5) !important;
-        padding: 0.2rem 1rem;
-        border-radius: 20px;
+    .favorite-topic {
+        color: #aaaaaa !important;
         font-size: 0.7rem;
-        letter-spacing: 0.05em;
     }
     
-    /* Star Button */
-    .stButton button[kind="secondary"] {
-        background: transparent !important;
-        border: none !important;
-        font-size: 1.5rem !important;
-        padding: 0 !important;
-        width: auto !important;
-        color: rgba(255,255,255,0.2) !important;
-    }
-    .stButton button[kind="secondary"]:hover {
-        color: #ff9800 !important;
-        transform: scale(1.2) !important;
-    }
-    
-    /* Download Buttons */
+    /* Download buttons */
     .stDownloadButton > button {
-        background: rgba(255,255,255,0.06) !important;
-        border: 1px solid rgba(255,255,255,0.08) !important;
-        color: rgba(255,255,255,0.7) !important;
+        background-color: #1a1a2e !important;
+        border: 1px solid #333 !important;
+        color: #ffffff !important;
         border-radius: 10px !important;
-        padding: 0.5rem 1rem !important;
-        font-size: 0.8rem !important;
+        padding: 0.4rem 1rem !important;
         width: 100% !important;
     }
     .stDownloadButton > button:hover {
-        background: rgba(255,255,255,0.1) !important;
-        border-color: rgba(255,255,255,0.2) !important;
-        color: #ffffff !important;
+        background-color: #2a2a4e !important;
     }
     
-    /* Info message */
+    /* Hide branding */
+    #MainMenu, footer, header {
+        display: none !important;
+    }
+    
+    /* Info text */
     .stAlert {
-        background: rgba(255,255,255,0.05) !important;
-        border-color: rgba(255,255,255,0.1) !important;
+        background-color: #1a1a2e !important;
+        border-color: #333 !important;
         color: #ffffff !important;
     }
     .stAlert p {
         color: #ffffff !important;
     }
     
-    /* Hide Streamlit branding */
-    #MainMenu, footer, header { visibility: hidden; }
-    
-    /* Number input */
-    input[type="number"] {
-        background: rgba(255,255,255,0.06) !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
+    /* Success message */
+    .stSuccess {
+        background-color: #1a2e1a !important;
+        border-color: #4caf50 !important;
         color: #ffffff !important;
-        border-radius: 8px !important;
+    }
+    .stSuccess p {
+        color: #ffffff !important;
     }
     
-    /* Divider */
-    hr {
-        border-color: rgba(255,255,255,0.05) !important;
+    /* Error message */
+    .stError {
+        background-color: #2e1a1a !important;
+        border-color: #f44336 !important;
+        color: #ffffff !important;
+    }
+    .stError p {
+        color: #ffffff !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -335,55 +204,45 @@ st.markdown("""
 # HEADER
 # ============================================
 st.markdown("""
-<div class="app-header">
-    <h1>✨ AI Caption Generator</h1>
-    <div class="subtitle">Instagram Captions · Powered by Groq</div>
-    <span class="badge">⚡ Llama 3.1</span>
+<div style="text-align: center; padding: 2rem 0 1rem;">
+    <h1 style="font-size: 3rem; font-weight: 700; background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">✨ AI Caption Generator</h1>
+    <p style="color: rgba(255,255,255,0.5); font-size: 1rem; letter-spacing: 0.3em; text-transform: uppercase; margin-top: 0.5rem;">Instagram Captions · Powered by Groq</p>
+    <span style="display: inline-block; background: rgba(79, 172, 254, 0.2); border: 1px solid rgba(79, 172, 254, 0.3); color: #4facfe; padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;">⚡ Llama 3.1</span>
 </div>
 """, unsafe_allow_html=True)
 
 # ============================================
 # SETTINGS
 # ============================================
-st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-
-col1, col2, col3 = st.columns([2, 2, 1])
-
-with col1:
-    topic = st.selectbox("📚 Topic", VALID_TOPICS)
-
-with col2:
-    style = st.selectbox("🎨 Style", VALID_STYLES)
-
-with col3:
-    num_captions = st.slider(
-        "📝 Count",
-        min_value=3,
-        max_value=8,
-        value=5,
-        step=1
-    )
-
-col1, col2 = st.columns(2)
-
-with col1:
-    language = st.selectbox(
-        "🌐 Language",
-        options=["English", "Spanish", "French", "German", "Hindi", "Urdu", "Arabic"],
-        index=0
-    )
-
-with col2:
-    creativity = st.slider(
-        "🎨 Creativity",
-        min_value=0.0,
-        max_value=1.0,
-        value=0.9,
-        step=0.1,
-        help="Higher = more creative"
-    )
-
-st.markdown('</div>', unsafe_allow_html=True)
+with st.container():
+    st.markdown("---")
+    
+    col1, col2, col3 = st.columns([2, 2, 1])
+    
+    with col1:
+        topic = st.selectbox("📚 Topic", VALID_TOPICS)
+    
+    with col2:
+        style = st.selectbox("🎨 Style", VALID_STYLES)
+    
+    with col3:
+        num_captions = st.slider("📝 Count", 3, 8, 5)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        language = st.selectbox(
+            "🌐 Language",
+            ["English", "Spanish", "French", "German", "Hindi", "Urdu", "Arabic"],
+            index=0
+        )
+    
+    with col2:
+        creativity = st.slider(
+            "🎨 Creativity",
+            0.0, 1.0, 0.9, 0.1,
+            help="Higher = more creative"
+        )
 
 # ============================================
 # GENERATE BUTTON
@@ -393,19 +252,17 @@ if st.button("✨ Generate Captions", type="primary", use_container_width=True):
         try:
             client = get_client()
             captions, elapsed = generate_captions(
-                topic, 
-                style, 
-                client,
+                topic, style, client,
                 language=language,
                 num_captions=num_captions,
                 creativity=creativity
             )
             hashtags = make_hashtags(topic, style)
-
+            
             st.session_state["captions"] = captions
             st.session_state["hashtags"] = hashtags
             st.session_state["elapsed"] = elapsed
-
+            
         except Exception as e:
             st.error(f"❌ Error: {e}")
             st.info("💡 Make sure GROQ_API_KEY is in Streamlit Secrets!")
@@ -417,22 +274,26 @@ if st.session_state.get("captions"):
     captions = st.session_state["captions"]
     hashtags = st.session_state["hashtags"]
     elapsed = st.session_state["elapsed"]
-
-    st.markdown(f'<span class="gen-badge">⏱ Generated in {elapsed}s</span>', unsafe_allow_html=True)
-
-    st.markdown('<div class="section-title"><span class="emoji">📝</span> Your Captions</div>', unsafe_allow_html=True)
-
+    
+    st.markdown(f"""
+    <div style="display: inline-block; background: rgba(79, 172, 254, 0.1); border: 1px solid rgba(79, 172, 254, 0.15); color: rgba(255,255,255,0.5); padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.7rem;">
+        ⏱ Generated in {elapsed}s
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">📝 Your Captions</h3>', unsafe_allow_html=True)
+    
     for i, cap in enumerate(captions, 1):
         char_count = len(cap)
-        color_class = "good" if char_count <= 150 else "ok" if char_count <= 200 else "long"
+        color = "good" if char_count <= 150 else "ok" if char_count <= 200 else "long"
         
         col1, col2 = st.columns([12, 1])
         with col1:
             st.markdown(f"""
             <div class="caption-card">
-                <span class="caption-number">#{i}</span>
+                <span style="color: rgba(255,255,255,0.3); font-size: 0.8rem; font-weight: 700; background: rgba(255,255,255,0.05); padding: 0.1rem 0.6rem; border-radius: 20px; margin-right: 0.5rem;">#{i}</span>
                 <span class="caption-text">{cap}</span>
-                <span class="caption-char {color_class}">· {char_count}/150</span>
+                <span class="caption-char {color}">· {char_count}/150</span>
             </div>
             """, unsafe_allow_html=True)
         with col2:
@@ -440,11 +301,11 @@ if st.session_state.get("captions"):
                 if save_favorite_caption(cap, topic, style):
                     st.success("✅ Saved!")
                     st.rerun()
-
+    
     # Copy and Download
     all_text = "\n".join(f"{i}. {c}" for i, c in enumerate(captions, 1))
     
-    st.markdown('<div class="section-title"><span class="emoji">📋</span> Copy & Download</div>', unsafe_allow_html=True)
+    st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">📋 Copy & Download</h3>', unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([2, 1, 1])
     with col1:
@@ -466,9 +327,9 @@ if st.session_state.get("captions"):
             mime="text/csv",
             use_container_width=True
         )
-
+    
     # Hashtags
-    st.markdown('<div class="section-title"><span class="emoji">#️⃣</span> Hashtags</div>', unsafe_allow_html=True)
+    st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">#️⃣ Hashtags</h3>', unsafe_allow_html=True)
     hashtag_html = " ".join(f'<span>{tag}</span>' for tag in hashtags.split())
     st.markdown(f'<div class="hashtag-box">{hashtag_html}</div>', unsafe_allow_html=True)
     
@@ -488,23 +349,22 @@ if st.session_state.get("captions"):
 # FAVORITES
 # ============================================
 st.markdown("---")
-st.markdown('<div class="section-title"><span class="emoji">⭐</span> Your Favorites</div>', unsafe_allow_html=True)
+st.markdown('<h3 style="color: #ffffff;">⭐ Your Favorites</h3>', unsafe_allow_html=True)
 
 favorites = get_favorites()
 
 if favorites:
     for idx, fav in enumerate(reversed(favorites)):
-        with st.container():
-            st.markdown(f"""
-            <div class="favorite-box">
-                <span class="favorite-topic">📌 {fav['topic'].upper()} · {fav['style'].upper()} · {fav['timestamp'][:16]}</span>
-                <div class="favorite-caption">{fav['caption']}</div>
-            </div>
-            """, unsafe_allow_html=True)
-            if st.button(f"🗑️ Delete", key=f"del_{idx}"):
-                if delete_favorite(len(favorites) - 1 - idx):
-                    st.success("Deleted!")
-                    st.rerun()
+        st.markdown(f"""
+        <div class="favorite-box">
+            <span class="favorite-topic">📌 {fav['topic'].upper()} · {fav['style'].upper()} · {fav['timestamp'][:16]}</span>
+            <div class="favorite-caption">{fav['caption']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button(f"🗑️ Delete", key=f"del_{idx}"):
+            if delete_favorite(len(favorites) - 1 - idx):
+                st.success("Deleted!")
+                st.rerun()
 else:
     st.info("💡 No favorites yet. Click ⭐ on any caption to save it!")
 
