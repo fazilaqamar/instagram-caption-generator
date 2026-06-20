@@ -18,10 +18,8 @@ from datetime import datetime
 def get_groq_api_key():
     """Get API key from Streamlit Secrets or .env file"""
     try:
-        # For Streamlit Cloud - reads from Secrets
         return st.secrets.get("GROQ_API_KEY")
     except (FileNotFoundError, AttributeError):
-        # For local development - reads from .env
         return os.getenv("GROQ_API_KEY")
 
 # Get API key from Secrets - NO HARDCODED KEY!
@@ -60,7 +58,6 @@ def get_client(api_key=None):
     if api_key:
         return {"api_key": api_key}
     
-    # Get from Secrets
     key = get_groq_api_key()
     if not key:
         raise ValueError("GROQ_API_KEY not found! Add it to Streamlit Secrets.")
@@ -120,7 +117,6 @@ Now generate {num_captions} {style} captions about {topic}:
             result = response.json()
             content = result['choices'][0]['message']['content']
             
-            # Extract captions
             captions = []
             lines = content.split('\n')
             
@@ -148,7 +144,6 @@ Now generate {num_captions} {style} captions about {topic}:
                     ]):
                         captions.append(line)
             
-            # Filter out any remaining introductions
             filtered_captions = []
             for cap in captions:
                 if not any([
@@ -161,18 +156,14 @@ Now generate {num_captions} {style} captions about {topic}:
             
             captions = filtered_captions[:num_captions]
             
-            # Ensure we have exactly num_captions
             while len(captions) < num_captions:
                 captions.append(f"✨ {style} {topic} caption {len(captions)+1}")
             
             return captions, elapsed
         else:
-            print(f"API Error: {response.status_code}")
-            print(response.text)
             return [], 0
             
     except Exception as e:
-        print(f"Error: {e}")
         return [], 0
 
 def make_hashtags(topic, style):
@@ -249,7 +240,6 @@ def save_favorite_caption(caption, topic, style):
         return True
         
     except Exception as e:
-        print(f"Error saving favorite: {e}")
         return False
 
 def get_favorites():
@@ -270,8 +260,7 @@ def delete_favorite(index):
                 json.dump(favorites, f, indent=2)
             return True
     except Exception as e:
-        print(f"Error deleting favorite: {e}")
-    return False
+        return False
 
 def clear_all_favorites():
     """Clear all favorites"""
@@ -280,9 +269,4 @@ def clear_all_favorites():
             json.dump([], f)
         return True
     except Exception as e:
-        print(f"Error clearing favorites: {e}")
-<<<<<<< HEAD
         return False
-=======
-        return False
->>>>>>> 8666f69107c19efea1475b1cb4755211502a3614
