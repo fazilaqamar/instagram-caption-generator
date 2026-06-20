@@ -18,104 +18,26 @@ st.set_page_config(
 )
 
 # ============================================
-# ULTIMATE DARK THEME - FORCES EVERYTHING!
+# DARK THEME - NO DROPDOWN ISSUE!
 # ============================================
 st.markdown("""
 <style>
-    /* Force dark background on EVERYTHING */
-    .stApp, .stApp > div, .main, .block-container, section, .st-emotion-cache-1v0mbdj, .st-emotion-cache-1r6slb0 {
+    .stApp {
         background: #0a0a0f !important;
-        background-color: #0a0a0f !important;
     }
     
     .main .block-container {
+        background: transparent !important;
         max-width: 900px;
         padding: 2rem !important;
-        background: transparent !important;
     }
     
-    /* ALL TEXT WHITE - FORCE */
+    /* ALL TEXT WHITE */
     * {
         color: #ffffff !important;
     }
     
-    /* === SELECTBOX - ULTIMATE FIX === */
-    /* The select box container */
-    .stSelectbox, .stSelectbox > div, .stSelectbox > div > div {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        border-radius: 10px !important;
-    }
-    
-    /* The select box value */
-    .stSelectbox > div > div > div {
-        background-color: #1a1a2e !important;
-        color: #ffffff !important;
-    }
-    
-    /* The dropdown list - THE KEY PART */
-    div[data-baseweb="select"] > div, 
-    div[data-baseweb="select"] > div > div,
-    ul[role="listbox"],
-    div[role="listbox"],
-    [role="listbox"] {
-        background-color: #1a1a2e !important;
-        border: 1px solid #444444 !important;
-        border-radius: 10px !important;
-    }
-    
-    /* Each dropdown option */
-    ul[role="listbox"] li, 
-    div[role="listbox"] li,
-    [role="listbox"] li {
-        background-color: #1a1a2e !important;
-        color: #ffffff !important;
-        padding: 8px 12px !important;
-        font-size: 0.9rem !important;
-    }
-    
-    /* Hover effect */
-    ul[role="listbox"] li:hover, 
-    div[role="listbox"] li:hover,
-    [role="listbox"] li:hover {
-        background-color: #2a2a4e !important;
-        color: #ffffff !important;
-    }
-    
-    /* Selected option */
-    ul[role="listbox"] li[aria-selected="true"],
-    div[role="listbox"] li[aria-selected="true"],
-    [role="listbox"] li[aria-selected="true"] {
-        background-color: #4facfe !important;
-        color: #ffffff !important;
-    }
-    
-    /* The dropdown arrow */
-    .stSelectbox svg, .stSelectbox svg * {
-        fill: #ffffff !important;
-        color: #ffffff !important;
-    }
-    
-    /* Selectbox label */
-    .stSelectbox label {
-        color: rgba(255,255,255,0.8) !important;
-        font-weight: 500 !important;
-        font-size: 0.8rem !important;
-        text-transform: uppercase !important;
-    }
-    
-    /* === SLIDER === */
-    .stSlider > div > div > div > div {
-        color: #ffffff !important;
-    }
-    .stSlider [data-baseweb="slider"] > div > div {
-        background: linear-gradient(90deg, #f093fb, #4facfe) !important;
-    }
-    .stSlider label {
-        color: rgba(255,255,255,0.8) !important;
-    }
-    
-    /* === BUTTONS === */
+    /* BUTTONS */
     .stButton > button {
         background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe) !important;
         color: #ffffff !important;
@@ -131,21 +53,20 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
     }
     
-    /* === DOWNLOAD BUTTONS === */
-    .stDownloadButton > button {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        color: #ffffff !important;
-        border-radius: 10px !important;
-        padding: 0.5rem 1rem !important;
-        width: 100% !important;
-    }
-    .stDownloadButton > button:hover {
-        background-color: #2a2a4e !important;
-        border-color: #4facfe !important;
+    /* SLIDER */
+    .stSlider [data-baseweb="slider"] > div > div {
+        background: linear-gradient(90deg, #f093fb, #4facfe) !important;
     }
     
-    /* === CAPTION CARDS === */
+    /* TEXT AREA */
+    .stTextArea > div > div > textarea {
+        background-color: #1a1a2e !important;
+        border: 1px solid #333333 !important;
+        border-radius: 10px !important;
+        color: #ffffff !important;
+    }
+    
+    /* CAPTION CARDS */
     .caption-card {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -158,7 +79,7 @@ st.markdown("""
         background-color: #2a2a4e !important;
     }
     
-    /* === HASHTAG BOX === */
+    /* HASHTAG BOX */
     .hashtag-box {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -172,7 +93,7 @@ st.markdown("""
         margin-right: 4px;
     }
     
-    /* === FAVORITE BOX === */
+    /* FAVORITE BOX */
     .favorite-box {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
@@ -182,41 +103,45 @@ st.markdown("""
         border-left: 4px solid #ff9800;
     }
     
-    /* === MESSAGES === */
-    .stAlert, .stSuccess, .stError, .stInfo {
-        background-color: #1a1a2e !important;
-        border-color: #333333 !important;
-    }
-    .stAlert p, .stSuccess p, .stError p, .stInfo p {
-        color: #ffffff !important;
-    }
-    .stSuccess { border-color: #4caf50 !important; }
-    .stError { border-color: #f44336 !important; }
-    
-    /* === TEXT AREA === */
-    .stTextArea > div > div > textarea {
+    /* DOWNLOAD BUTTONS */
+    .stDownloadButton > button {
         background-color: #1a1a2e !important;
         border: 1px solid #333333 !important;
-        border-radius: 10px !important;
         color: #ffffff !important;
+        border-radius: 10px !important;
+        padding: 0.5rem 1rem !important;
+        width: 100% !important;
     }
-    .stTextArea > div > div > textarea:focus {
+    .stDownloadButton > button:hover {
+        background-color: #2a2a4e !important;
         border-color: #4facfe !important;
     }
     
-    /* === SPINNER === */
-    .stSpinner > div {
-        color: #ffffff !important;
-    }
-    
-    /* === HIDE BRANDING === */
+    /* Hide branding */
     #MainMenu, footer, header {
         display: none !important;
     }
     
-    /* === DIVIDER === */
     hr {
         border-color: rgba(255,255,255,0.05) !important;
+    }
+    
+    /* ========== FIX FOR SELECTBOX ========== */
+    /* This makes the select box DARK */
+    .stSelectbox > div > div {
+        background-color: #1a1a2e !important;
+        border: 1px solid #444444 !important;
+        border-radius: 10px !important;
+        color: #ffffff !important;
+    }
+    
+    .stSelectbox > div > div > div {
+        color: #ffffff !important;
+        background-color: #1a1a2e !important;
+    }
+    
+    .stSelectbox > div > div:hover {
+        border-color: #4facfe !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -233,36 +158,34 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================
-# SETTINGS
+# SETTINGS - USING COLUMNS FOR BETTER LAYOUT
 # ============================================
 st.markdown("---")
 
-col1, col2, col3 = st.columns([2, 2, 1])
-
+# Row 1: Topic & Style
+col1, col2 = st.columns(2)
 with col1:
     topic = st.selectbox("📚 Topic", VALID_TOPICS)
-
 with col2:
     style = st.selectbox("🎨 Style", VALID_STYLES)
 
-with col3:
-    num_captions = st.slider("📝 Count", 3, 8, 5)
-
+# Row 2: Language & Creativity
 col1, col2 = st.columns(2)
-
 with col1:
     language = st.selectbox(
         "🌐 Language",
         ["English", "Spanish", "French", "German", "Hindi", "Urdu", "Arabic"],
         index=0
     )
-
 with col2:
     creativity = st.slider(
         "🎨 Creativity",
         0.0, 1.0, 0.9, 0.1,
         help="Higher = more creative"
     )
+
+# Row 3: Number of Captions
+num_captions = st.slider("📝 Number of Captions", 3, 8, 5)
 
 # ============================================
 # GENERATE BUTTON
