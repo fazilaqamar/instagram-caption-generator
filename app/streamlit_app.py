@@ -103,52 +103,52 @@ div[data-baseweb="select"] > div:hover {
     border-color: #555 !important;
 }
 
-/* Generate button */
 div.stButton > button {
     width: 100%;
-    background: #f0f0f0;
-    color: #0a0a0a;
+    background: linear-gradient(135deg, #7C3AED, #A855F7);
+    color: #ffffff;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 0.9rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    padding: 0.85rem 1.5rem;
     margin-top: 0.5rem;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 div.stButton > button:hover {
-    background: #fff;
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(255,255,255,0.08);
+    background: linear-gradient(135deg, #9333EA, #C084FC);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
 }
 
 /* Caption cards */
 .caption-card {
-    background: #111;
-    border: 1px solid #1e1e1e;
+    background: #15111F;
+    border: 1px solid #2D2340;
     border-radius: 12px;
     padding: 1rem 1.2rem;
     margin-bottom: 0.6rem;
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    transition: border-color 0.2s;
+    transition: all 0.2s ease;
 }
 
 .caption-card:hover {
-    border-color: #444;
+    border-color: #9333EA;
+    background: #1B1428;
 }
 
 .caption-num {
     font-family: 'Syne', sans-serif;
     font-size: 0.7rem;
     font-weight: 700;
-    color: #777;
+    color: #A78BFA;
     letter-spacing: 0.1em;
     min-width: 20px;
 }
@@ -162,19 +162,19 @@ div.stButton > button:hover {
 
 /* Hashtags */
 .hashtag-box {
-    background: #0e0e0e;
-    border: 1px dashed #333;
+    background: #15111F;
+    border: 1px dashed #6D28D9;
     border-radius: 10px;
     padding: 1rem 1.2rem;
     font-size: 0.82rem;
-    color: #aaa;
+    color: #C4B5FD;
     line-height: 1.8;
     word-break: break-all;
     margin-top: 0.5rem;
 }
 
 .hashtag-box span {
-    color: #3a7fff;
+    color: #C084FC;
     margin-right: 4px;
 }
 
@@ -192,15 +192,14 @@ div.stButton > button:hover {
 /* Speed badge */
 .speed-badge {
     display: inline-block;
-    background: #111;
-    border: 1px solid #333;
+    background: #211632;
+    border: 1px solid #6D28D9;
     border-radius: 20px;
     padding: 0.2rem 0.7rem;
     font-size: 0.75rem;
-    color: #aaa;
+    color: #C4B5FD;
     margin-top: 1rem;
 }
-
 /* Text areas */
 textarea {
     background: #111 !important;
