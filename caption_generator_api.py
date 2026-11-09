@@ -1,22 +1,30 @@
-import streamlit as st
-import requests
-import json
+import os
 import re
 import time
 from datetime import datetime
+
+import requests
+import streamlit as st
 
 # ============================================
 # API KEY MANAGEMENT
 # ============================================
 
-def get_groq_api_key():
-    try:
-        return st.secrets.get("GROQ_API_KEY")
-    except:
-        return ""
-
-GROQ_API_KEY = get_groq_api_key()
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+MODEL = "llama-3.1-8b-instant"
+REQUEST_TIMEOUT = 30
+
+
+def get_groq_api_key():
+    """Read GROQ_API_KEY from Streamlit Secrets (fallback: environment variable)."""
+    try:
+        key = st.secrets.get("GROQ_API_KEY")
+        if key:
+            return key
+    except Exception:
+        pass
+    return os.environ.get("GROQ_API_KEY", "")
+
 
 # ============================================
 # CONSTANTS
@@ -26,28 +34,47 @@ VALID_TOPICS = [
     "cars", "travel", "fashion", "fitness",
     "food", "nature", "tech", "beauty",
     "pets", "music", "art", "photography",
-    "business", "entrepreneur", "lifestyle", "wellness"
+    "business", "entrepreneur", "lifestyle", "wellness",
 ]
 
 VALID_STYLES = [
     "funny", "luxury", "motivational",
     "aesthetic", "bold", "emotional",
     "savage", "relatable", "poetic",
-    "witty", "inspirational", "vibes"
+    "witty", "inspirational", "vibes",
 ]
 
 # ============================================
 # API FUNCTIONS
 # ============================================
 
+
 def get_client(api_key=None):
-    if api_key:
-        return {"api_key": api_key}
-    return {"api_key": GROQ_API_KEY}
+    key = api_key or get_groq_api_key()
+    if not key:
+        raise ValueError(
+            "GROQ_API_KEY is missing. Add it in Manage app > Settings > Secrets."
+        )
+    return {"api_key": key}
+
+
+def _parse_captions(content):
+    captions = []
+    for line in content.split("\n"):
+        line = line.strip()
+        match = re.match(r"^\s*(\d+)[.)]\s*(.+)", line)
+        if match:
+            caption = match.group(2).strip().strip('"“”')
+            if caption and not caption.lower().startswith(("here are", "check out", "some")):
+                captions.append(caption)
+    return captions
+
 
 def generate_captions(topic, style, client, language="English", num_captions=5, creativity=0.9):
+    """Return (captions, elapsed_seconds). Raises RuntimeError / ValueError on failure."""
     lang_instruction = f"Write in {language}." if language != "English" else ""
-    
+
+    numbered_format = "\n".join(f"{i}. [caption]" for i in range(1, num_captions + 1))
     prompt = f"""Generate exactly {num_captions} Instagram captions about {topic} in {style} style. {lang_instruction}
 
 Rules:
@@ -58,55 +85,47 @@ Rules:
 - Make them unique
 
 Format:
-1. [caption]
-2. [caption]
-3. [caption]
-4. [caption]
-5. [caption]"""
+{numbered_format}"""
 
     headers = {
         "Authorization": f"Bearer {client['api_key']}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
-    
+
     data = {
-        "model": "llama-3.1-8b-instant",
+        "model": MODEL,
         "messages": [
             {"role": "system", "content": "Generate ONLY captions. Start directly with number 1. No introductions."},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": prompt},
         ],
-        "temperature": creativity,
-        "max_tokens": 400
+        "temperature": float(creativity),
+        "max_tokens": 900,
     }
-    
+
     start = time.time()
-    
     try:
-        response = requests.post(GROQ_URL, headers=headers, json=data)
-        elapsed = round(time.time() - start, 2)
-        
-        if response.status_code == 200:
-            result = response.json()
-            content = result['choices'][0]['message']['content']
-            
-            captions = []
-            for line in content.split('\n'):
-                line = line.strip()
-                match = re.match(r'^\s*(\d+)[.)]\s*(.+)', line)
-                if match:
-                    caption = match.group(2).strip()
-                    if not caption.lower().startswith(('here are', 'check out', 'some')):
-                        captions.append(caption)
-            
-            while len(captions) < num_captions:
-                captions.append(f"✨ {style} {topic} caption {len(captions)+1}")
-            
-            return captions[:num_captions], elapsed
-        else:
-            return [], 0
-            
+        response = requests.post(GROQ_URL, headers=headers, json=data, timeout=REQUEST_TIMEOUT)
+    except requests.Timeout as e:
+        raise RuntimeError("Groq request timed out. Please try again.") from e
+    except requests.RequestException as e:
+        raise RuntimeError(f"Could not reach Groq: {e}") from e
+
+    elapsed = round(time.time() - start, 2)
+
+    if response.status_code != 200:
+        raise RuntimeError(f"Groq API error {response.status_code}: {response.text[:300]}")
+
+    try:
+        content = response.json()["choices"][0]["message"]["content"]
     except Exception as e:
-        return [], 0
+        raise RuntimeError(f"Unexpected response from Groq: {e}") from e
+
+    captions = _parse_captions(content)
+    if not captions:
+        raise RuntimeError("The model returned no usable captions. Please try again.")
+
+    return captions[:num_captions], elapsed
+
 
 def make_hashtags(topic, style):
     hashtag_map = {
@@ -125,71 +144,60 @@ def make_hashtags(topic, style):
         "business": ["#entrepreneur", "#businessowner", "#success", "#startup"],
         "entrepreneur": ["#entrepreneurlife", "#hustle", "#successmindset", "#businessgrowth"],
         "lifestyle": ["#lifestyle", "#lifestyleblogger", "#dailyvibes", "#mindfulness"],
-        "wellness": ["#wellness", "#selfcare", "#healthyliving", "#mindfulness"]
+        "wellness": ["#wellness", "#selfcare", "#healthyliving", "#mindfulness"],
     }
-    
+
     style_tags = {
         "funny": "#lol", "luxury": "#luxury", "motivational": "#mindset",
         "aesthetic": "#aesthetic", "bold": "#bold", "emotional": "#feelings",
         "savage": "#savage", "relatable": "#relatable", "poetic": "#poetry",
-        "witty": "#witty", "inspirational": "#inspire", "vibes": "#vibes"
+        "witty": "#witty", "inspirational": "#inspire", "vibes": "#vibes",
     }
-    
+
     tags = hashtag_map.get(topic, ["#instagram", "#viral"])
     style_tag = style_tags.get(style, "#content")
     default = ["#viral", "#instagram", "#trending", "#fyp"]
-    
+
     all_tags = tags + [style_tag] + default
     return " ".join(list(dict.fromkeys(all_tags))[:12])
 
+
 # ============================================
-# FAVORITES FUNCTIONS
+# FAVORITES FUNCTIONS (per user session)
 # ============================================
+
+
+def _favs():
+    if "favorites" not in st.session_state:
+        st.session_state["favorites"] = []
+    return st.session_state["favorites"]
+
 
 def save_favorite_caption(caption, topic, style):
-    import os
-    try:
-        favorites_file = "data/favorites.json"
-        os.makedirs("data", exist_ok=True)
-        try:
-            with open(favorites_file, 'r') as f:
-                favorites = json.load(f)
-        except:
-            favorites = []
-        favorites.append({
-            "timestamp": datetime.now().isoformat(),
-            "topic": topic,
-            "style": style,
-            "caption": caption
-        })
-        with open(favorites_file, 'w') as f:
-            json.dump(favorites, f, indent=2)
-        return True
-    except:
+    favs = _favs()
+    if any(f["caption"] == caption for f in favs):
         return False
+    favs.append({
+        "timestamp": datetime.now().isoformat(),
+        "topic": topic,
+        "style": style,
+        "caption": caption,
+    })
+    return True
+
 
 def get_favorites():
-    try:
-        with open("data/favorites.json", 'r') as f:
-            return json.load(f)
-    except:
-        return []
+    return list(_favs())
+
 
 def delete_favorite(index):
-    try:
-        favorites = get_favorites()
-        if 0 <= index < len(favorites):
-            del favorites[index]
-            with open("data/favorites.json", 'w') as f:
-                json.dump(favorites, f, indent=2)
-            return True
-    except:
-        return False
+    favs = _favs()
+    if 0 <= index < len(favs):
+        del favs[index]
+        return True
+    return False
+
 
 def clear_all_favorites():
-    try:
-        with open("data/favorites.json", 'w') as f:
-            json.dump([], f)
-        return True
-    except:
-        return False
+    _favs().clear()
+    return True
