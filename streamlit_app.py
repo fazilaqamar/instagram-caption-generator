@@ -1,430 +1,123 @@
-import streamlit as st
-from caption_generator_api import (
-    get_client,
-    generate_captions,
-    make_hashtags,
-    VALID_TOPICS,
-    VALID_STYLES,
-    save_favorite_caption,
-    get_favorites,
-    delete_favorite,
-    clear_all_favorites
-)
 
-st.set_page_config(
-    page_title="⚡ AI Caption Generator",
-    page_icon="✨",
-    layout="wide"
-)
+def make_hashtags(topic, style):
+    """Create relevant hashtags for the selected topic and style."""
 
-# ============================================
-# COMPLETE DARK THEME - WITH POPOVER FIX!
-# ============================================
-st.markdown("""
-<style>
-    /* Dark background */
-    .stApp {
-        background: #0a0a0f !important;
+    hashtag_map = {
+        "cars": ["#carsofinstagram", "#dreamcar", "#automotive", "#carlover"],
+        "travel": ["#travelgram", "#wanderlust", "#exploremore", "#vacationmode"],
+        "fashion": ["#fashionstyle", "#ootd", "#outfitcheck", "#styleinspo"],
+        "fitness": ["#fitcheck", "#gymrat", "#gains", "#workout"],
+        "food": ["#foodie", "#instafood", "#foodporn", "#nomnomnom"],
+        "nature": ["#earthpix", "#naturephotography", "#outdoors", "#natgeo"],
+        "tech": ["#techbro", "#gadgets", "#innovation", "#techlife"],
+        "beauty": ["#glowup", "#skincare", "#makeuptok", "#beautytips"],
+        "pets": ["#petlover", "#dogsofinstagram", "#catsofinstagram", "#furryfriends"],
+        "music": ["#musiclover", "#songwriter", "#musician", "#livemusic"],
+        "art": ["#artwork", "#artist", "#creative", "#artgram"],
+        "photography": ["#photographer", "#photooftheday", "#capturethemoment", "#lens"],
+        "business": ["#entrepreneur", "#businessowner", "#success", "#startup"],
+        "entrepreneur": ["#entrepreneurlife", "#hustle", "#successmindset", "#businessgrowth"],
+        "lifestyle": ["#lifestyle", "#lifestyleblogger", "#dailyvibes", "#mindfulness"],
+        "wellness": ["#wellness", "#selfcare", "#healthyliving", "#mindfulness"],
     }
-    
-    .main .block-container {
-        background: transparent !important;
-        max-width: 900px;
-        padding: 2rem !important;
-    }
-    
-    /* ALL TEXT WHITE */
-    * {
-        color: #ffffff !important;
-    }
-    
-    /* ========== SELECTBOX FIX ========== */
-    .stSelectbox > div > div {
-        background-color: #1a1a2e !important;
-        border: 1px solid #444444 !important;
-        border-radius: 10px !important;
-    }
-    
-    .stSelectbox > div > div > div {
-        color: #ffffff !important;
-        background-color: #1a1a2e !important;
-    }
-    
-    /* Dropdown popover fix */
-    [data-baseweb="popover"],
-    [data-baseweb="popover"] > div,
-    [data-baseweb="popover"] ul,
-    [data-baseweb="menu"],
-    [data-baseweb="menu"] > div,
-    [data-baseweb="menu"] ul,
-    ul[role="listbox"],
-    div[role="listbox"] {
-        background-color: #1a1a2e !important;
-        border: 1px solid #444444 !important;
-        border-radius: 10px !important;
-    }
-    
-    [data-baseweb="popover"] *,
-    [data-baseweb="menu"] *,
-    ul[role="listbox"] * {
-        background-color: #1a1a2e !important;
-        color: #ffffff !important;
-    }
-    
-    ul[role="listbox"] li,
-    [data-baseweb="popover"] ul li,
-    [data-baseweb="menu"] ul li,
-    div[role="listbox"] li {
-        background-color: #1a1a2e !important;
-        color: #ffffff !important;
-        padding: 8px 12px !important;
-    }
-    
-    ul[role="listbox"] li:hover,
-    [data-baseweb="popover"] ul li:hover {
-        background-color: #2a2a4e !important;
-        color: #ffffff !important;
-    }
-    
-    ul[role="listbox"] li[aria-selected="true"],
-    [data-baseweb="popover"] ul li[aria-selected="true"] {
-        background-color: #4facfe !important;
-        color: #ffffff !important;
-    }
-    
-    .stSelectbox svg {
-        fill: #ffffff !important;
-    }
-    
-    .stSelectbox label {
-        color: rgba(255,255,255,0.8) !important;
-        font-weight: 500 !important;
-        font-size: 0.8rem !important;
-        text-transform: uppercase !important;
-    }
-    
-    /* ========== BUTTONS ========== */
-    .stButton > button {
-        background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe) !important;
-        color: #ffffff !important;
-        font-weight: 600 !important;
-        border: none !important;
-        border-radius: 14px !important;
-        padding: 0.9rem !important;
-        width: 100% !important;
-        font-size: 1rem !important;
-    }
-    .stButton > button:hover {
-        transform: scale(1.02);
-        box-shadow: 0 4px 20px rgba(245, 87, 108, 0.4);
-    }
-    
-    /* ========== SLIDER ========== */
-    .stSlider [data-baseweb="slider"] > div > div {
-        background: linear-gradient(90deg, #f093fb, #4facfe) !important;
-    }
-    
-    /* ========== TEXT AREA ========== */
-    .stTextArea > div > div > textarea {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        border-radius: 10px !important;
-        color: #ffffff !important;
-    }
-    
-    /* ========== CAPTION CARDS ========== */
-    .caption-card {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        border-radius: 12px;
-        padding: 1rem 1.2rem;
-        margin-bottom: 0.8rem;
-        border-left: 4px solid #4facfe;
-        transition: all 0.3s ease;
-    }
-    .caption-card:hover {
-        background-color: #2a2a4e !important;
-        transform: translateX(4px);
-    }
-    
-    .caption-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 8px;
-    }
-    
-    /* ========== HASHTAG BOX ========== */
-    .hashtag-box {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        border-radius: 12px;
-        padding: 1rem;
-        font-size: 0.85rem;
-        line-height: 2;
-    }
-    .hashtag-box span {
-        color: #4facfe !important;
-        margin-right: 4px;
-    }
-    
-    /* ========== FAVORITE BOX ========== */
-    .favorite-box {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        border-radius: 10px;
-        padding: 0.8rem 1rem;
-        margin-bottom: 0.6rem;
-        border-left: 4px solid #ff9800;
-    }
-    
-    /* ========== DOWNLOAD BUTTONS ========== */
-    .stDownloadButton > button {
-        background-color: #1a1a2e !important;
-        border: 1px solid #333333 !important;
-        color: #ffffff !important;
-        border-radius: 10px !important;
-        padding: 0.5rem 1rem !important;
-        width: 100% !important;
-    }
-    .stDownloadButton > button:hover {
-        background-color: #2a2a4e !important;
-        border-color: #4facfe !important;
-    }
-    
-    /* ========== MESSAGES ========== */
-    .stAlert, .stSuccess, .stError, .stInfo {
-        background-color: #1a1a2e !important;
-        border-color: #333333 !important;
-    }
-    .stAlert p, .stSuccess p, .stError p, .stInfo p {
-        color: #ffffff !important;
-    }
-    
-    /* ========== EXAMPLE BOX ========== */
-    .example-box {
-        background-color: #1a1a2e !important;
-        border: 1px dashed #444444 !important;
-        border-radius: 10px;
-        padding: 0.8rem 1rem;
-        margin-top: 0.5rem;
-        font-size: 0.85rem;
-        color: rgba(255,255,255,0.5) !important;
-    }
-    .example-box span {
-        color: #4facfe !important;
-        cursor: pointer;
-    }
-    .example-box span:hover {
-        color: #f093fb !important;
-    }
-    
-    /* ========== BADGE ========== */
-    .badge {
-        display: inline-block;
-        background: rgba(79, 172, 254, 0.15) !important;
-        border: 1px solid rgba(79, 172, 254, 0.2) !important;
-        color: #4facfe !important;
-        padding: 0.1rem 0.6rem;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        margin-left: 0.5rem;
-    }
-    
-    /* Hide branding */
-    #MainMenu, footer, header {
-        display: none !important;
-    }
-    
-    hr {
-        border-color: rgba(255,255,255,0.05) !important;
-    }
-</style>
-""", unsafe_allow_html=True)
 
-# ============================================
-# HEADER
-# ============================================
-st.markdown("""
-<div style="text-align: center; padding: 2rem 0 1rem;">
-    <h1 style="font-size: 3rem; font-weight: 700; background: linear-gradient(135deg, #f093fb, #f5576c, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">✨ AI Caption Generator</h1>
-    <p style="color: rgba(255,255,255,0.5); font-size: 1rem; letter-spacing: 0.3em; text-transform: uppercase; margin-top: 0.5rem;">Instagram Captions · Powered by Groq</p>
-    <span style="display: inline-block; background: rgba(79, 172, 254, 0.2); border: 1px solid rgba(79, 172, 254, 0.3); color: #4facfe; padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;">⚡ Llama 3.1</span>
-</div>
-""", unsafe_allow_html=True)
+    style_tags = {
+        "funny": "#lol",
+        "luxury": "#luxury",
+        "motivational": "#mindset",
+        "aesthetic": "#aesthetic",
+        "bold": "#bold",
+        "emotional": "#feelings",
+        "savage": "#savage",
+        "relatable": "#relatable",
+        "poetic": "#poetry",
+        "witty": "#witty",
+        "inspirational": "#inspire",
+        "vibes": "#vibes",
+    }
 
-# ============================================
-# SETTINGS
-# ============================================
-st.markdown("---")
+    default_tags = [
+        "#viral", "#instagram", "#trending",
+        "#contentcreator", "#fyp"
+    ]
 
-col1, col2 = st.columns(2)
-with col1:
-    topic = st.selectbox("📚 Topic", VALID_TOPICS)
-with col2:
-    style = st.selectbox("🎨 Style", VALID_STYLES)
+    topic_tags = hashtag_map.get(topic, ["#instagram", "#viral"])
+    style_tag = style_tags.get(style, "#content")
 
-col1, col2 = st.columns(2)
-with col1:
-    language = st.selectbox(
-        "🌐 Language",
-        ["English", "Spanish", "French", "German", "Hindi", "Urdu", "Arabic"],
-        index=0
-    )
-with col2:
-    creativity = st.slider(
-        "🎨 Creativity",
-        0.0, 1.0, 0.9, 0.1,
-        help="Higher = more creative"
-    )
+    all_tags = topic_tags + [style_tag] + default_tags
+    unique_tags = list(dict.fromkeys(all_tags))
 
-num_captions = st.slider("📝 Number of Captions", 3, 8, 5)
+    return " ".join(unique_tags[:15])
 
-# ============================================
-# EXAMPLE PROMPTS
-# ============================================
-with st.expander("💡 Need inspiration? Try these examples!"):
-    st.markdown("""
-    <div class="example-box">
-        <span>📸 Summer road trip vibes</span> · 
-        <span>✨ Luxury lifestyle captions</span> · 
-        <span>💪 Funny gym captions</span> · 
-        <span>🍕 Foodie puns</span> · 
-        <span>🌅 Sunset aesthetic</span>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ============================================
-# GENERATE
-# ============================================
-if st.button("✨ Generate Captions", type="primary", use_container_width=True):
-    with st.spinner("🎨 Crafting viral captions..."):
-        try:
-            client = get_client()
-            captions, elapsed = generate_captions(
-                topic, style, client,
-                language=language,
-                num_captions=num_captions,
-                creativity=creativity
-            )
-            hashtags = make_hashtags(topic, style)
-            
-            st.session_state["captions"] = captions
-            st.session_state["hashtags"] = hashtags
-            st.session_state["elapsed"] = elapsed
-            
-        except Exception as e:
-            st.error(f"❌ Error: {e}")
-            st.info("💡 Make sure GROQ_API_KEY is in Streamlit Secrets!")
-
-# ============================================
-# DISPLAY RESULTS
-# ============================================
-if st.session_state.get("captions"):
-    captions = st.session_state["captions"]
-    hashtags = st.session_state["hashtags"]
-    elapsed = st.session_state["elapsed"]
-    
-    # Show generation time
-    st.markdown(f"""
-    <div style="display: inline-block; background: rgba(79, 172, 254, 0.1); border: 1px solid rgba(79, 172, 254, 0.15); color: rgba(255,255,255,0.5); padding: 0.2rem 1rem; border-radius: 20px; font-size: 0.7rem; margin-bottom: 1rem;">
-        ⏱ Generated in {elapsed}s
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Favorites count badge
-    fav_count = len(get_favorites())
-    st.markdown(f"""
-    <div style="display: inline-block; margin-left: 0.5rem;">
-        <span class="badge">⭐ {fav_count} Favorites</span>
-        <span class="badge">📜 {len(st.session_state.get('history', []))} History</span>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown('<h3 style="color: #ffffff; margin-top: 0.5rem;">📝 Your Captions</h3>', unsafe_allow_html=True)
-    
-    for i, cap in enumerate(captions, 1):
-        char_count = len(cap)
-        color = "good" if char_count <= 150 else "ok" if char_count <= 200 else "long"
-        
-        col1, col2 = st.columns([12, 1])
-        with col1:
-            st.markdown(f"""
-            <div class="caption-card">
-                <span style="color: rgba(255,255,255,0.3); font-size: 0.8rem; font-weight: 700; background: rgba(255,255,255,0.05); padding: 0.1rem 0.6rem; border-radius: 20px; margin-right: 0.5rem;">#{i}</span>
-                <span style="color: #ffffff; font-size: 1rem; line-height: 1.6;">{cap}</span>
-                <span style="font-size: 0.7rem; margin-left: 0.5rem; color: {'#4caf50' if char_count <= 150 else '#ff9800' if char_count <= 200 else '#f44336'} !important;">· {char_count}/150</span>
-            </div>
-            """, unsafe_allow_html=True)
-        with col2:
-            if st.button("⭐", key=f"fav_{i}"):
-                if save_favorite_caption(cap, topic, style):
-                    st.success("✅ Saved!")
-                    st.rerun()
-    
-    # Copy and Download
-    all_text = "\n".join(f"{i}. {c}" for i, c in enumerate(captions, 1))
-    
-    st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">📋 Copy & Download</h3>', unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([2, 1, 1])
-    with col1:
-        st.text_area("Copy all captions", value=all_text, height=100, label_visibility="collapsed")
-    with col2:
-        st.download_button(
-            label="📥 Download TXT",
-            data=all_text,
-            file_name=f"captions_{topic}_{style}.txt",
-            mime="text/plain",
-            use_container_width=True
-        )
-    with col3:
-        csv_data = "Caption,Character Count\n" + "\n".join(f'"{c}",{len(c)}' for c in captions)
-        st.download_button(
-            label="📊 Download CSV",
-            data=csv_data,
-            file_name=f"captions_{topic}_{style}.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-    
-    # Hashtags - ONE TIME ONLY!
-    unique_hashtags = list(dict.fromkeys(hashtags.split()))
-    hashtags_fixed = " ".join(unique_hashtags)
-    
-    st.markdown('<h3 style="color: #ffffff; margin-top: 1.5rem;">#️⃣ Hashtags</h3>', unsafe_allow_html=True)
-    hashtag_html = " ".join(f'<span>{tag}</span>' for tag in unique_hashtags)
-    st.markdown(f'<div class="hashtag-box">{hashtag_html}</div>', unsafe_allow_html=True)
 
 # ============================================
 # FAVORITES
 # ============================================
-st.markdown("---")
-st.markdown(f'<h3 style="color: #ffffff;">⭐ Your Favorites ({len(get_favorites())})</h3>', unsafe_allow_html=True)
 
-favorites = get_favorites()
+def _favorites_file():
+    """Return the favorites JSON path and ensure its directory exists."""
+    os.makedirs("data", exist_ok=True)
+    return os.path.join("data", "favorites.json")
 
-if favorites:
-    for idx, fav in enumerate(reversed(favorites)):
-        st.markdown(f"""
-        <div class="favorite-box">
-            <span style="color: rgba(255,255,255,0.4); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;">📌 {fav['topic'].upper()} · {fav['style'].upper()} · {fav['timestamp'][:16]}</span>
-            <div style="color: #ffffff; font-size: 0.9rem; margin-top: 0.2rem;">{fav['caption']}</div>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button(f"🗑️ Delete", key=f"del_{idx}"):
-            if delete_favorite(len(favorites) - 1 - idx):
-                st.success("Deleted!")
-                st.rerun()
-else:
-    st.info("💡 No favorites yet. Click ⭐ on any caption to save it!")
 
-# ============================================
-# FOOTER
-# ============================================
-st.markdown("""
-<div style="text-align: center; padding: 2rem 0 0.5rem; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 2rem;">
-    <span style="color: rgba(255,255,255,0.2); font-size: 0.7rem; letter-spacing: 0.1em;">
-        Built with ❤️ · Groq AI · Llama 3.1
-    </span>
-</div>
-""", unsafe_allow_html=True)
+def get_favorites():
+    """Load saved favorite captions."""
+    path = _favorites_file()
+
+    try:
+        with open(path, "r", encoding="utf-8") as file:
+            data = json.load(file)
+            return data if isinstance(data, list) else []
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return []
+
+
+def save_favorite_caption(caption, topic, style):
+    """Save one caption to data/favorites.json."""
+    try:
+        favorites = get_favorites()
+        favorites.append({
+            "timestamp": datetime.now().isoformat(timespec="minutes"),
+            "topic": topic,
+            "style": style,
+            "caption": caption,
+        })
+
+        with open(_favorites_file(), "w", encoding="utf-8") as file:
+            json.dump(favorites, file, indent=2, ensure_ascii=False)
+
+        return True
+
+    except (OSError, TypeError, ValueError):
+        return False
+
+
+def delete_favorite(index):
+    """Delete a favorite using its zero-based index."""
+    try:
+        favorites = get_favorites()
+
+        if not 0 <= index < len(favorites):
+            return False
+
+        del favorites[index]
+
+        with open(_favorites_file(), "w", encoding="utf-8") as file:
+            json.dump(favorites, file, indent=2, ensure_ascii=False)
+
+        return True
+
+    except (OSError, TypeError, ValueError):
+        return False
+
+
+def clear_all_favorites():
+    """Delete all saved favorites."""
+    try:
+        with open(_favorites_file(), "w", encoding="utf-8") as file:
+            json.dump([], file, indent=2)
+
+        return True
+
+    except OSError:
+        return False
