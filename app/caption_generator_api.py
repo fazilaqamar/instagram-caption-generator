@@ -1,280 +1,197 @@
-"""
-Caption Generator API - Backend Logic
-Uses Groq API (Llama 3.1)
-"""
+"""Backend for the AI Caption Generator (Streamlit + Groq)."""
 
-import os
-import streamlit as st
-import requests
 import json
+import os
 import re
 import time
 from datetime import datetime
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
-
-# ============================================
-# API KEY MANAGEMENT
-# ============================================
-
-def get_groq_api_key():
-    """Get API key from Streamlit Secrets or .env file"""
-    try:
-        return st.secrets.get("GROQ_API_KEY")
-    except (FileNotFoundError, AttributeError):
-        return os.getenv("GROQ_API_KEY")
-
-# Get API key
-GROQ_API_KEY = get_groq_api_key()
-
-# If no API key found, use default
-if not GROQ_API_KEY:
-    GROQ_API_KEY = "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"
+import requests
+import streamlit as st
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-
-# ============================================
-# CONSTANTS
-# ============================================
+MODEL = "llama-3.1-8b-instant"
+REQUEST_TIMEOUT = 30
 
 VALID_TOPICS = [
-    "cars", "travel", "fashion", "fitness",
-    "food", "nature", "tech", "beauty",
-    "pets", "music", "art", "photography",
-    "business", "entrepreneur", "lifestyle", "wellness"
+    "travel", "food", "fitness", "fashion", "nature", "lifestyle",
+    "business", "technology", "music", "art", "friends", "family",
+    "love", "motivation", "pets", "photography",
 ]
 
 VALID_STYLES = [
-    "funny", "luxury", "motivational",
-    "aesthetic", "bold", "emotional",
-    "savage", "relatable", "poetic",
-    "witty", "inspirational", "vibes"
+    "funny", "inspirational", "aesthetic", "romantic", "witty", "casual",
+    "professional", "poetic", "sassy", "minimal", "bold", "wholesome",
 ]
 
-# ============================================
-# API FUNCTIONS
-# ============================================
+
+# ---------------------------------------------------------------
+# API key / client
+# ---------------------------------------------------------------
+def get_groq_api_key():
+    """Read the key from Streamlit Secrets, falling back to an env var."""
+    try:
+        key = st.secrets.get("GROQ_API_KEY")
+        if key:
+            return key
+    except Exception:
+        pass
+    return os.environ.get("GROQ_API_KEY")
+
 
 def get_client(api_key=None):
-    """Initialize Groq client"""
-    if api_key:
-        return {"api_key": api_key}
-    return {"api_key": GROQ_API_KEY}
+    key = api_key or get_groq_api_key()
+    if not key:
+        raise ValueError(
+            "GROQ_API_KEY is missing. Add it in Manage app > Settings > Secrets."
+        )
+    return {"api_key": key}
 
-def generate_captions(topic, style, client, language="English", num_captions=5, creativity=0.9):
-    """Generate captions using Groq API"""
-    
-    lang_instruction = f"Write in {language}." if language != "English" else ""
-    
-    prompt = f"""You are a professional social media copywriter.
 
-Generate exactly {num_captions} Instagram captions about {topic} in {style} style. {lang_instruction}
+# ---------------------------------------------------------------
+# Caption generation
+# ---------------------------------------------------------------
+def _clean_caption(text):
+    text = text.strip()
+    text = re.sub(r"^\s*(?:\d+[\.\)]|[-*•])\s*", "", text)  # "1. " / "- "
+    return text.strip().strip('"“”').strip()
 
-CRITICAL RULES:
-- NO INTRODUCTORY LINES (no "Here are...", "Check out...")
-- START DIRECTLY with caption 1
-- Each caption: 10-25 words
-- Use 1-3 emojis naturally
-- Make them unique and engaging
-- NO repetitive phrases
-- NO hashtags in captions
 
-Format EXACTLY like this:
-1. [Your first caption]
-2. [Your second caption]
-3. [Your third caption]
-4. [Your fourth caption]
-5. [Your fifth caption]
+def _extract_captions(content, num_captions):
+    """Try JSON first, then fall back to line-by-line parsing."""
+    captions = []
 
-Now generate {num_captions} {style} captions about {topic}:
-"""
+    match = re.search(r"\[.*\]", content, re.DOTALL)
+    if match:
+        try:
+            data = json.loads(match.group(0))
+            if isinstance(data, list):
+                captions = [_clean_caption(str(c)) for c in data]
+        except json.JSONDecodeError:
+            pass
+
+    if not captions:
+        for line in content.splitlines():
+            line = _clean_caption(line)
+            if len(line) > 8 and not line.lower().startswith(("here are", "sure")):
+                captions.append(line)
+
+    captions = [c for c in captions if c]
+    return captions[:num_captions]
+
+
+def generate_captions(topic, style, client, language="English",
+                      num_captions=5, creativity=0.9):
+    """Return (captions, elapsed_seconds). Raises RuntimeError on failure."""
+    prompt = (
+        f"Write {num_captions} Instagram captions about '{topic}' in a "
+        f"'{style}' style, in {language}. Keep each under 150 characters and "
+        f"include fitting emojis. Do not include hashtags. "
+        f"Reply ONLY with a JSON array of {num_captions} strings."
+    )
 
     headers = {
         "Authorization": f"Bearer {client['api_key']}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
-    
-    data = {
-        "model": "llama-3.1-8b-instant",
+    payload = {
+        "model": MODEL,
         "messages": [
-            {"role": "system", "content": "You are a professional Instagram copywriter. Generate ONLY captions, no introductions. Start directly with number 1."},
-            {"role": "user", "content": prompt}
+            {"role": "system", "content": "You are a creative social media copywriter."},
+            {"role": "user", "content": prompt},
         ],
-        "temperature": creativity,
-        "max_tokens": 400
+        "temperature": float(creativity),
+        "max_tokens": 1024,
     }
-    
-    start_time = time.time()
-    
+
+    start = time.time()
     try:
-        response = requests.post(GROQ_URL, headers=headers, json=data)
-        elapsed = round(time.time() - start_time, 2)
-        
-        if response.status_code == 200:
-            result = response.json()
-            content = result['choices'][0]['message']['content']
-            
-            # Extract captions
-            captions = []
-            lines = content.split('\n')
-            
-            for line in lines:
-                line = line.strip()
-                if not line:
-                    continue
-                    
-                match = re.match(r'^\s*(\d+)[.)]\s*(.+)', line)
-                if match:
-                    caption = match.group(2).strip()
-                    if not any([
-                        caption.lower().startswith('here are'),
-                        caption.lower().startswith('check out'),
-                        caption.lower().startswith('some'),
-                        'caption' in caption.lower()[:30],
-                        ':' in caption and len(caption) < 40
-                    ]):
-                        captions.append(caption)
-                elif line and len(captions) < num_captions:
-                    if not any([
-                        line.lower().startswith('here are'),
-                        line.lower().startswith('check out'),
-                        len(line) < 10
-                    ]):
-                        captions.append(line)
-            
-            # Filter out any remaining introductions
-            filtered_captions = []
-            for cap in captions:
-                if not any([
-                    cap.lower().startswith('here are'),
-                    cap.lower().startswith('check out'),
-                    'caption' in cap.lower()[:30] and len(cap) < 50,
-                    len(cap) < 10
-                ]):
-                    filtered_captions.append(cap)
-            
-            captions = filtered_captions[:num_captions]
-            
-            # Ensure we have exactly num_captions
-            while len(captions) < num_captions:
-                captions.append(f"✨ {style} {topic} caption {len(captions)+1}")
-            
-            return captions, elapsed
-        else:
-            print(f"API Error: {response.status_code}")
-            print(response.text)
-            return [], 0
-            
+        response = requests.post(
+            GROQ_URL, headers=headers, json=payload, timeout=REQUEST_TIMEOUT
+        )
+        if response.status_code != 200:
+            raise RuntimeError(f"HTTP {response.status_code}: {response.text[:300]}")
+        content = response.json()["choices"][0]["message"]["content"]
+    except requests.Timeout as e:
+        raise RuntimeError("Groq request timed out. Try again.") from e
+    except RuntimeError:
+        raise
     except Exception as e:
-        print(f"Error: {e}")
-        return [], 0
+        raise RuntimeError(f"Groq API failed: {e}") from e
+
+    captions = _extract_captions(content, num_captions)
+    if not captions:
+        raise RuntimeError("The model returned no usable captions. Try again.")
+
+    return captions, round(time.time() - start, 2)
+
+
+# ---------------------------------------------------------------
+# Hashtags
+# ---------------------------------------------------------------
+_STYLE_TAGS = {
+    "funny": ["#funny", "#humor", "#lol"],
+    "inspirational": ["#inspiration", "#mindset", "#positivevibes"],
+    "aesthetic": ["#aesthetic", "#vibes", "#moodboard"],
+    "romantic": ["#romantic", "#lovestory", "#couplegoals"],
+    "witty": ["#witty", "#clever", "#wordplay"],
+    "casual": ["#casual", "#everyday", "#chill"],
+    "professional": ["#professional", "#career", "#growth"],
+    "poetic": ["#poetry", "#words", "#writersofinstagram"],
+    "sassy": ["#sassy", "#attitude", "#unapologetic"],
+    "minimal": ["#minimal", "#simple", "#lessismore"],
+    "bold": ["#bold", "#confidence", "#fearless"],
+    "wholesome": ["#wholesome", "#kindness", "#goodvibes"],
+}
+
+_GENERIC_TAGS = ["#instagood", "#instadaily", "#photooftheday", "#explore", "#trending"]
+
 
 def make_hashtags(topic, style):
-    """Generate hashtags for the given topic and style"""
-    
-    hashtag_map = {
-        "cars": ["#carsofinstagram", "#dreamcar", "#automotive", "#carlover"],
-        "travel": ["#travelgram", "#wanderlust", "#exploremore", "#vacationmode"],
-        "fashion": ["#fashionstyle", "#ootd", "#outfitcheck", "#styleinspo"],
-        "fitness": ["#fitcheck", "#gymrat", "#gains", "#workout"],
-        "food": ["#foodie", "#instafood", "#foodporn", "#nomnomnom"],
-        "nature": ["#earthpix", "#naturephotography", "#outdoors", "#natgeo"],
-        "tech": ["#techbro", "#gadgets", "#innovation", "#techlife"],
-        "beauty": ["#glowup", "#skincare", "#makeuptok", "#beautytips"],
-        "pets": ["#petlover", "#dogsofinstagram", "#catsofinstagram", "#furryfriends"],
-        "music": ["#musiclover", "#songwriter", "#musician", "#livemusic"],
-        "art": ["#artwork", "#artist", "#creative", "#artgram"],
-        "photography": ["#photographer", "#photooftheday", "#capturethemoment", "#lens"],
-        "business": ["#entrepreneur", "#businessowner", "#success", "#startup"],
-        "entrepreneur": ["#entrepreneurlife", "#hustle", "#successmindset", "#businessgrowth"],
-        "lifestyle": ["#lifestyle", "#lifestyleblogger", "#dailyvibes", "#mindfulness"],
-        "wellness": ["#wellness", "#selfcare", "#healthyliving", "#mindfulness"]
-    }
-    
-    style_tags = {
-        "funny": "#lol",
-        "luxury": "#luxury",
-        "motivational": "#mindset",
-        "aesthetic": "#aesthetic",
-        "bold": "#bold",
-        "emotional": "#feelings",
-        "savage": "#savage",
-        "relatable": "#relatable",
-        "poetic": "#poetry",
-        "witty": "#witty",
-        "inspirational": "#inspire",
-        "vibes": "#vibes"
-    }
-    
-    default = ["#viral", "#instagram", "#trending", "#contentcreator", "#fyp"]
-    
-    topic_tags = hashtag_map.get(topic, ["#instagram", "#viral"])
-    style_tag = style_tags.get(style, "#content")
-    
-    all_tags = topic_tags + [style_tag] + default
-    return " ".join(list(dict.fromkeys(all_tags))[:15])
+    topic_clean = re.sub(r"[^a-z0-9]", "", topic.lower())
+    tags = [
+        f"#{topic_clean}", f"#{topic_clean}lover", f"#{topic_clean}life",
+        f"#{topic_clean}gram",
+    ]
+    tags += _STYLE_TAGS.get(style.lower(), [f"#{style.lower()}"])
+    tags += _GENERIC_TAGS
+    return " ".join(dict.fromkeys(tags))
 
-# ============================================
-# FAVORITES FUNCTIONS
-# ============================================
+
+# ---------------------------------------------------------------
+# Favorites (stored per user session)
+# ---------------------------------------------------------------
+def _fav_list():
+    if "favorites" not in st.session_state:
+        st.session_state["favorites"] = []
+    return st.session_state["favorites"]
+
 
 def save_favorite_caption(caption, topic, style):
-    """Save a favorite caption to favorites.json"""
-    try:
-        favorites_file = "data/favorites.json"
-        os.makedirs("data", exist_ok=True)
-        
-        try:
-            with open(favorites_file, 'r') as f:
-                favorites = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            favorites = []
-        
-        favorite = {
-            "timestamp": datetime.now().isoformat(),
-            "topic": topic,
-            "style": style,
-            "caption": caption
-        }
-        favorites.append(favorite)
-        
-        with open(favorites_file, 'w') as f:
-            json.dump(favorites, f, indent=2)
-        return True
-        
-    except Exception as e:
-        print(f"Error saving favorite: {e}")
+    favs = _fav_list()
+    if any(f["caption"] == caption for f in favs):
         return False
+    favs.append({
+        "caption": caption,
+        "topic": topic,
+        "style": style,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    })
+    return True
+
 
 def get_favorites():
-    """Get all favorite captions"""
-    try:
-        with open("data/favorites.json", 'r') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+    return list(_fav_list())
+
 
 def delete_favorite(index):
-    """Delete a favorite by index"""
-    try:
-        favorites = get_favorites()
-        if 0 <= index < len(favorites):
-            del favorites[index]
-            with open("data/favorites.json", 'w') as f:
-                json.dump(favorites, f, indent=2)
-            return True
-    except Exception as e:
-        print(f"Error deleting favorite: {e}")
+    favs = _fav_list()
+    if 0 <= index < len(favs):
+        favs.pop(index)
+        return True
     return False
 
+
 def clear_all_favorites():
-    """Clear all favorites"""
-    try:
-        with open("data/favorites.json", 'w') as f:
-            json.dump([], f)
-        return True
-    except Exception as e:
-        print(f"Error clearing favorites: {e}")
-        return False
+    _fav_list().clear()
+    return True
