@@ -135,7 +135,7 @@ div.stButton > button:hover {
     padding: 1rem 1.2rem;
     margin-bottom: 0.6rem;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1rem;
     transition: border-color 0.2s;
 }
