@@ -1,15 +1,16 @@
-# ============================================================
-#  streamlit_app.py  —  Instagram Caption Generator UI
-#  Run: streamlit run streamlit_app.py
-# ============================================================
 
-# pip install streamlit groq
-# Place this file in same folder as caption_generator_api.py
+# ============================================================
+# streamlit_app.py — Instagram Caption Generator UI
+# Run: streamlit run streamlit_app.py
+# ============================================================
 
 import streamlit as st
 from caption_generator_api import (
-    get_client, generate_captions, make_hashtags,
-    VALID_TOPICS, VALID_STYLES,
+    get_client,
+    generate_captions,
+    make_hashtags,
+    VALID_TOPICS,
+    VALID_STYLES,
 )
 
 # =========================
@@ -22,7 +23,20 @@ st.set_page_config(
 )
 
 # =========================
-# CUSTOM CSS — dark luxury aesthetic
+# SESSION STATE
+# =========================
+if "captions" not in st.session_state:
+    st.session_state["captions"] = []
+
+if "hashtags" not in st.session_state:
+    st.session_state["hashtags"] = ""
+
+if "elapsed" not in st.session_state:
+    st.session_state["elapsed"] = 0
+
+
+# =========================
+# CUSTOM CSS — DARK LUXURY
 # =========================
 st.markdown("""
 <style>
@@ -34,7 +48,6 @@ html, body, [class*="css"] {
     color: #f0f0f0;
 }
 
-/* Main container */
 .main .block-container {
     max-width: 720px;
     padding: 2rem 1.5rem 4rem;
@@ -47,6 +60,7 @@ html, body, [class*="css"] {
     border-bottom: 1px solid #1e1e1e;
     margin-bottom: 2rem;
 }
+
 .app-header h1 {
     font-family: 'Syne', sans-serif;
     font-size: 2.4rem;
@@ -57,25 +71,26 @@ html, body, [class*="css"] {
     -webkit-text-fill-color: transparent;
     margin: 0 0 0.3rem;
 }
+
 .app-header p {
-    color: #555;
+    color: #777;
     font-size: 0.9rem;
     margin: 0;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
-/* Selectbox label */
+/* Labels */
 label {
     font-family: 'Syne', sans-serif !important;
     font-size: 0.75rem !important;
     font-weight: 600 !important;
     letter-spacing: 0.12em !important;
     text-transform: uppercase !important;
-    color: #666 !important;
+    color: #999 !important;
 }
 
-/* Selectbox */
+/* Select boxes */
 div[data-baseweb="select"] > div {
     background: #111 !important;
     border: 1px solid #222 !important;
@@ -83,8 +98,9 @@ div[data-baseweb="select"] > div {
     color: #f0f0f0 !important;
     font-family: 'DM Sans', sans-serif !important;
 }
+
 div[data-baseweb="select"] > div:hover {
-    border-color: #444 !important;
+    border-color: #555 !important;
 }
 
 /* Generate button */
@@ -104,13 +120,14 @@ div.stButton > button {
     cursor: pointer;
     transition: all 0.2s ease;
 }
+
 div.stButton > button:hover {
     background: #fff;
     transform: translateY(-1px);
     box-shadow: 0 8px 24px rgba(255,255,255,0.08);
 }
 
-/* Caption card */
+/* Caption cards */
 .caption-card {
     background: #111;
     border: 1px solid #1e1e1e;
@@ -122,49 +139,53 @@ div.stButton > button:hover {
     gap: 1rem;
     transition: border-color 0.2s;
 }
+
 .caption-card:hover {
-    border-color: #333;
+    border-color: #444;
 }
+
 .caption-num {
     font-family: 'Syne', sans-serif;
     font-size: 0.7rem;
     font-weight: 700;
-    color: #333;
+    color: #777;
     letter-spacing: 0.1em;
     min-width: 20px;
 }
+
 .caption-text {
     font-size: 0.95rem;
     color: #e8e8e8;
     flex: 1;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
-/* Hashtag box */
+/* Hashtags */
 .hashtag-box {
     background: #0e0e0e;
-    border: 1px dashed #222;
+    border: 1px dashed #333;
     border-radius: 10px;
     padding: 1rem 1.2rem;
     font-size: 0.82rem;
-    color: #555;
+    color: #aaa;
     line-height: 1.8;
     word-break: break-all;
     margin-top: 0.5rem;
 }
+
 .hashtag-box span {
     color: #3a7fff;
     margin-right: 4px;
 }
 
-/* Section label */
+/* Section labels */
 .section-label {
     font-family: 'Syne', sans-serif;
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #444;
+    color: #888;
     margin: 1.5rem 0 0.6rem;
 }
 
@@ -172,40 +193,33 @@ div.stButton > button:hover {
 .speed-badge {
     display: inline-block;
     background: #111;
-    border: 1px solid #1e1e1e;
+    border: 1px solid #333;
     border-radius: 20px;
     padding: 0.2rem 0.7rem;
     font-size: 0.75rem;
-    color: #555;
+    color: #aaa;
     margin-top: 1rem;
 }
 
-/* Text area for copy */
+/* Text areas */
 textarea {
     background: #111 !important;
-    border: 1px solid #222 !important;
-    color: #888 !important;
+    border: 1px solid #333 !important;
+    color: #ddd !important;
     border-radius: 8px !important;
     font-size: 0.82rem !important;
 }
 
-/* API key input */
-input[type="password"], input[type="text"] {
-    background: #111 !important;
-    border: 1px solid #222 !important;
-    color: #f0f0f0 !important;
-    border-radius: 8px !important;
-    font-family: 'DM Sans', sans-serif !important;
-}
-
 /* Divider */
 hr {
-    border-color: #1a1a1a !important;
+    border-color: #222 !important;
     margin: 1.5rem 0 !important;
 }
 
-/* Hide streamlit branding */
-#MainMenu, footer, header { visibility: hidden; }
+/* Hide Streamlit branding */
+#MainMenu, footer, header {
+    visibility: hidden;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -219,24 +233,6 @@ st.markdown("""
     <p>Groq AI — GenZ Instagram Captions</p>
 </div>
 """, unsafe_allow_html=True)
-
-
-# =========================
-# API KEY INPUT
-# =========================
-with st.expander("🔑 API Key Setup", expanded=not st.session_state.get("api_key_saved")):
-    api_key_input = st.text_input(
-        "Groq API Key",
-        type="password",
-        placeholder="gsk_...",
-        help="Get your key at https://console.groq.com",
-    )
-    if api_key_input:
-        st.session_state["api_key"] = api_key_input
-        st.session_state["api_key_saved"] = True
-        st.success("✅ Key saved for this session")
-
-api_key = st.session_state.get("api_key", "")
 
 
 # =========================
@@ -258,54 +254,82 @@ with col2:
         format_func=lambda x: x.capitalize(),
     )
 
+
+# =========================
+# GENERATE BUTTON
+# =========================
 generate_btn = st.button("Generate Captions →")
 
 
 # =========================
-# GENERATE
+# GENERATE CAPTIONS
 # =========================
 if generate_btn:
-    if not api_key:
-        st.error("❌ API key required — enter it above")
-        st.stop()
 
-    with st.spinner("Generating..."):
+    with st.spinner("Creating your captions... ⚡"):
+
         try:
-            client = get_client(api_key)
-            captions, elapsed = generate_captions(topic, style, client)
+            # Automatically reads GROQ_API_KEY from Streamlit Secrets
+            client = get_client()
+
+            captions, elapsed = generate_captions(
+                topic,
+                style,
+                client,
+            )
+
             hashtags = make_hashtags(topic, style)
 
-            # save to session
+            # Save results in session
             st.session_state["captions"] = captions
             st.session_state["hashtags"] = hashtags
             st.session_state["elapsed"] = elapsed
 
+        except ValueError as e:
+            st.error(f"⚠️ {e}")
+
         except Exception as e:
-            st.error(f"❌ Error: {e}")
-            st.stop()
+            st.error(f"❌ Generation failed: {e}")
 
 
 # =========================
 # DISPLAY RESULTS
 # =========================
-if st.session_state.get("captions"):
+if st.session_state["captions"]:
 
     captions = st.session_state["captions"]
     hashtags = st.session_state["hashtags"]
     elapsed = st.session_state["elapsed"]
 
-    st.markdown('<div class="section-label">📝 Captions</div>', unsafe_allow_html=True)
+    # Captions heading
+    st.markdown(
+        '<div class="section-label">📝 Captions</div>',
+        unsafe_allow_html=True,
+    )
 
+    # Individual caption cards
     for i, cap in enumerate(captions, 1):
+
+        safe_caption = (
+            str(cap)
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+        )
+
         st.markdown(f"""
         <div class="caption-card">
-            <span class="caption-num">0{i}</span>
-            <span class="caption-text">{cap}</span>
+            <span class="caption-num">{i:02d}</span>
+            <span class="caption-text">{safe_caption}</span>
         </div>
         """, unsafe_allow_html=True)
 
-    # copy all captions
-    all_captions_text = "\n".join(f"{i}. {c}" for i, c in enumerate(captions, 1))
+    # Copy all captions
+    all_captions_text = "\n".join(
+        f"{i}. {c}"
+        for i, c in enumerate(captions, 1)
+    )
+
     st.text_area(
         "Copy all captions",
         value=all_captions_text,
@@ -313,14 +337,24 @@ if st.session_state.get("captions"):
         label_visibility="collapsed",
     )
 
-    st.markdown('<div class="section-label">#️⃣ Hashtags</div>', unsafe_allow_html=True)
-
-    # render hashtags as colored spans
-    hashtag_html = " ".join(
-        f'<span>{tag}</span>' for tag in hashtags.split()
+    # Hashtags heading
+    st.markdown(
+        '<div class="section-label">#️⃣ Hashtags</div>',
+        unsafe_allow_html=True,
     )
-    st.markdown(f'<div class="hashtag-box">{hashtag_html}</div>', unsafe_allow_html=True)
 
+    # Hashtag styling
+    hashtag_html = " ".join(
+        f'<span>{tag}</span>'
+        for tag in hashtags.split()
+    )
+
+    st.markdown(
+        f'<div class="hashtag-box">{hashtag_html}</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Copy hashtags
     st.text_area(
         "Copy hashtags",
         value=hashtags,
@@ -328,10 +362,18 @@ if st.session_state.get("captions"):
         label_visibility="collapsed",
     )
 
-    st.markdown(f'<div class="speed-badge">⏱ {elapsed}s</div>', unsafe_allow_html=True)
-
-    st.markdown("---")
+    # Generation speed
     st.markdown(
-        '<p style="text-align:center;color:#2a2a2a;font-size:0.75rem;">Built with Groq AI · Llama 3.1</p>',
+        f'<div class="speed-badge">⏱ {elapsed}s</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Footer
+    st.markdown("---")
+
+    st.markdown(
+        '<p style="text-align:center;color:#777;font-size:0.75rem;">'
+        'Built with Groq AI · Llama 3.1'
+        '</p>',
         unsafe_allow_html=True,
     )
