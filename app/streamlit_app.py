@@ -157,7 +157,7 @@ div.stButton > button:hover {
     font-size: 0.95rem;
     color: #e8e8e8;
     flex: 1;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 /* Hashtags */
