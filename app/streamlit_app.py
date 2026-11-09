@@ -373,7 +373,7 @@ if st.session_state["captions"]:
 
     st.markdown(
         '<p style="text-align:center;color:#777;font-size:0.75rem;">'
-        'Built with Groq AI · Llama 3.1'
+        'Built with Groq AI · GPT-OSS 20B'
         '</p>',
         unsafe_allow_html=True,
     )
